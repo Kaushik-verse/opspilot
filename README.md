@@ -283,7 +283,7 @@ opspilot/
 
 <div align="center">
 
-### Made with ☕ and curiosity by **CH Kaushik**
+### Made with ☕ and curiosity by **Ch Kaushik**
 
 [GitHub](https://github.com/Kaushik-verse) · MIT License
 
