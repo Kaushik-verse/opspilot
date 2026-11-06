@@ -1,0 +1,25 @@
+skip  small             scale_zero-detection (already done)
+skip  small             scale_zero-localization (already done)
+PASS  small             scale_zero-mitigation        steps= 7 tokens=  8038  
+skip  small             target_port-detection (already done)
+skip  small             target_port-localization (already done)
+skip  small             target_port-mitigation (already done)
+skip  small             bad_image-detection (already done)
+PASS  small             bad_image-localization       steps= 6 tokens=  8283  
+skip  small             bad_image-mitigation (already done)
+skip  small             node_selector-detection (already done)
+skip  small             node_selector-localization (already done)
+skip  small             node_selector-mitigation (already done)
+skip  small             missing_env-detection (already done)
+skip  small             missing_env-localization (already done)
+ERR   small             missing_env-mitigation       steps= 3 tokens=  2863  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 400: {"error":{"message":"Tool choice is none, but model ca
+PASS  small             healthy-detection            steps= 5 tokens=  7467  
+
+| Config | Overall | Detection | Localization | Mitigation | Avg steps | Tokens / episode | Large-model token share | Guardrail blocks |
+|---|---|---|---|---|---|---|---|---|
+| `small` | **88%** | 100% | 100% | 60% | 7.4 | 11,432 | 0% | 7 |
+| `large` | **100%** | 100% | 100% | 100% | 7.6 | 14,606 | 100% | 0 |
+
+run: `main-k2` · backend: `sim` · small model: `openai/gpt-oss-20b` · large model: `openai/gpt-oss-120b` · max steps: `15` · python: `3.11.8`
+
+Report: results/main-k2/report.html

@@ -1,0 +1,86 @@
+{
+  "summary": {
+    "episode": "scale_zero-detection",
+    "scenario": "scale_zero",
+    "task": "detection",
+    "config": "cascade",
+    "success": true,
+    "answer": "Yes",
+    "detail": "answered yes, expected yes",
+    "steps": 5,
+    "small_tokens": 7582,
+    "large_tokens": 0,
+    "llm_calls": 5,
+    "escalated": false,
+    "escalation_reason": "",
+    "blocked_actions": 0,
+    "format_errors": 0,
+    "writes": 0,
+    "wall_s": 18.446402583000236,
+    "llm_s": 2.6814166660005867,
+    "error": "",
+    "total_tokens": 7582
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 586,
+      "latency_s": 0.6,
+      "response": "```\nexec_shell(\"kubectl get pods -n hotel-reservation -o wide\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pods -n hotel-reservation -o wide",
+      "guardrail": "read",
+      "observation": "NAME                                     READY   STATUS    RESTARTS   AGE   IP             NODE           NOMINATED NODE   READINESS GATES\nfrontend-4dc6abb6e-fd83b                 1/1     Running   0          42m   10.244.1.147   kind-worker2   <none>           <none>\nsearch-c179abadc-6cfc4                   1/1     Running   0          42m   10.244.2.165   kind-worker2   <none>           <none>\ngeo-f4b9f2896-d3b50                      1/1     Running   0          42m   10.244.1.138   kind-worker    <none>           <none>\nrate-cd21c2450-1321d                     1/1     Running   0          42m   10.244.1.224   kind-worker    <none>           <none>\nrecommendation-c829feafe-40309           1/1     Running   0          42m   10.244.1.106   kind-worker2   <none>           <none>\nreservation-657541b01-4bee0              1/1     Running   0          42m   10.244.1.118   kind-worker    <none>           <none>\nuser-47b43b1dc-6848d                     1/1     Running   0          42m   10.244.2.49    kind-worker2   <none>           <none>\nmongodb-geo-bfc840abb-c98db              1/1     Running   0          42m   10.244.1.64    kind-worker2   <none>           <none>\nmongodb-rate-230f5c1f9-1ec6c             1/1     Running   0          42m   10.244.2.132   kind-worker    <none>           <none>\nmongodb-profile-e174becf9-60a15          1/1     Running   0          42m   10.244.1.82    kind-worker2   <none>           <none>\nmongodb-recommendation-a35e4dea7-d2d46   1/1     Running   0          42m   10.244.1.27    kind-worker    <none>           <none>\nmongodb-reservation-a7f1d70d8-af973      1/1     Running   0          42m   10.244.1.151   kind-worker    <none>           <none>\nmongodb-user-eff0da4a6-42cdc             1/1     Running   0          42m   10.244.2.59    kind-worker    <none>           <none>"
+    },
+    {
+      "step": 2,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1072,
+      "latency_s": 0.22,
+      "response": "```\nexec_shell(\"kubectl get deployments -n hotel-reservation -o wide\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get deployments -n hotel-reservation -o wide",
+      "guardrail": "read",
+      "observation": "NAME                     READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS               IMAGES                                SELECTOR\nfrontend                 1/1     1            1           42m   frontend                 opspilot/hotel-frontend:1.4.2         app=frontend\nsearch                   1/1     1            1           42m   search                   opspilot/hotel-search:1.4.2           app=search\ngeo                      1/1     1            1           42m   geo                      opspilot/hotel-geo:1.4.2              app=geo\nrate                     1/1     1            1           42m   rate                     opspilot/hotel-rate:1.4.2             app=rate\nprofile                  0/0     0            0           42m   profile                  opspilot/hotel-profile:1.4.2          app=profile\nrecommendation           1/1     1            1           42m   recommendation           opspilot/hotel-recommendation:1.4.2   app=recommendation\nreservation              1/1     1            1           42m   reservation              opspilot/hotel-reservation:1.4.2      app=reservation\nuser                     1/1     1            1           42m   user                     opspilot/hotel-user:1.4.2             app=user\nmongodb-geo              1/1     1            1           42m   mongodb-geo              mongo:6.0.14                          app=mongodb-geo\nmongodb-rate             1/1     1            1           42m   mongodb-rate             mongo:6.0.14                          app=mongodb-rate\nmongodb-profile          1/1     1            1           42m   mongodb-profile          mongo:6.0.14                          app=mongodb-profile\nmongodb-recommendation   1/1     1            1           42m   mongodb-recommendation   mongo:6.0.14                          app=mongodb-recommendation\nmongodb-reservation      1/1     1            1           42m   mongodb-reservation      mongo:6.0.14                          app=mongodb-reservation\nmongodb-user             1/1     1            1           42m   mongodb-user             mongo:6.0.14                          app=mongodb-user"
+    },
+    {
+      "step": 3,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1623,
+      "latency_s": 0.57,
+      "response": "```\nexec_shell(\"kubectl get endpoints -n hotel-reservation -o wide\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get endpoints -n hotel-reservation -o wide",
+      "guardrail": "read",
+      "observation": "NAME                     ENDPOINTS            AGE\nfrontend                 10.244.1.147:5000    42m\nsearch                   10.244.2.165:8082    42m\ngeo                      10.244.1.138:8083    42m\nrate                     10.244.1.224:8084    42m\nprofile                  <none>               42m\nrecommendation           10.244.1.106:8085    42m\nreservation              10.244.1.118:8087    42m\nuser                     10.244.2.49:8086     42m\nmongodb-geo              10.244.1.64:27017    42m\nmongodb-rate             10.244.2.132:27017   42m\nmongodb-profile          10.244.1.82:27017    42m\nmongodb-recommendation   10.244.1.27:27017    42m\nmongodb-reservation      10.244.1.151:27017   42m\nmongodb-user             10.244.2.59:27017    42m"
+    },
+    {
+      "step": 4,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 2148,
+      "latency_s": 0.55,
+      "response": "```\nexec_shell(\"kubectl logs deployment/profile -n hotel-reservation\")\n``````\nsubmit(\"Yes\")\n```",
+      "action": "exec_shell",
+      "warning": "2 code blocks; only the first was executed",
+      "command": "kubectl logs deployment/profile -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "error: timed out waiting for the condition (deployment/profile has no pods)"
+    },
+    {
+      "step": 5,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 2153,
+      "latency_s": 0.74,
+      "response": "```\nsubmit(\"Yes\")\n```\n",
+      "action": "submit",
+      "answer": "Yes",
+      "observation": "[evaluation] SUCCESS: answered yes, expected yes"
+    }
+  ]
+}

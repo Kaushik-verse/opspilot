@@ -1,0 +1,8 @@
+{
+  "run": "main",
+  "backend": "sim",
+  "small model": "openai/gpt-oss-20b",
+  "large model": "openai/gpt-oss-120b",
+  "max steps": 15,
+  "python": "3.11.8"
+}

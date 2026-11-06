@@ -1,0 +1,27 @@
+PASS  cascade           scale_zero-detection         steps= 5 tokens=  7582  
+PASS  cascade           scale_zero-localization      steps= 8 tokens= 11728  
+PASS  cascade           scale_zero-mitigation        steps=10 tokens= 15405 (escalated: repeated command) 
+PASS  cascade           target_port-detection        steps=10 tokens= 20937 (escalated: no answer after 8 steps) 
+PASS  cascade           target_port-localization     steps=10 tokens= 20663 (escalated: format error) 
+FAIL  cascade           target_port-mitigation       steps=11 tokens= 21011 (escalated: guardrail block) 
+PASS  cascade           bad_image-detection          steps= 6 tokens=  9407  
+PASS  cascade           bad_image-localization       steps= 6 tokens=  9281  
+PASS  cascade           bad_image-mitigation         steps=13 tokens= 17360 (escalated: repeated command) 
+PASS  cascade           node_selector-detection      steps= 6 tokens=  8108  
+PASS  cascade           node_selector-localization   steps= 6 tokens=  8323  
+PASS  cascade           node_selector-mitigation     steps= 7 tokens=  8746  
+PASS  cascade           missing_env-detection        steps= 8 tokens= 16015 (escalated: guardrail block) 
+PASS  cascade           missing_env-localization     steps= 6 tokens=  8694 (escalated: guardrail block) 
+PASS  cascade           missing_env-mitigation       steps= 7 tokens=  8107  
+PASS  cascade           healthy-detection            steps= 5 tokens=  7467  
+PASS  cascade-noverify  scale_zero-detection         steps= 5 tokens=  7813  
+ERR   cascade-noverify  scale_zero-localization      steps= 4 tokens=  4328  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 429: {"error":{"message":"Rate limit reached for model `ope
+PASS  cascade-noverify  scale_zero-mitigation        steps= 9 tokens= 11169 (escalated: repeated command) 
+ERR   cascade-noverify  target_port-detection        steps= 1 tokens=   586  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 429: {"error":{"message":"Rate limit reached for model `ope
+ERR   cascade-noverify  target_port-localization     steps= 3 tokens=  2936  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 429: {"error":{"message":"Rate limit reached for model `ope
+ERR   cascade-noverify  target_port-mitigation       steps= 4 tokens=  3623  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 429: {"error":{"message":"Rate limit reached for model `ope
+PASS  cascade-noverify  bad_image-detection          steps= 2 tokens=  1891  
+ERR   cascade-noverify  bad_image-localization       steps= 1 tokens=   563  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 429: {"error":{"message":"Rate limit reached for model `ope
+ERR   cascade-noverify  bad_image-mitigation         steps= 2 tokens=  1464  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 429: {"error":{"message":"Rate limit reached for model `ope
+ERR   cascade-noverify  node_selector-detection      steps= 2 tokens=  1693  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 429: {"error":{"message":"Rate limit reached for model `ope
+ERR   cascade-noverify  node_selector-localization   steps= 3 tokens=  3123  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 429: {"error":{"message":"Rate limit reached for model `ope

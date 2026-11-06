@@ -1,0 +1,8 @@
+{
+  "run": "kind-oracle",
+  "backend": "kind",
+  "small model": "scripted expert (no LLM)",
+  "large model": "scripted expert (no LLM)",
+  "max steps": 15,
+  "python": "3.11.8"
+}

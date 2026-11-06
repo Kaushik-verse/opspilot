@@ -1,0 +1,64 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+      - name: Lint
+        run: uvx ruff check src tests
+      - name: Unit tests
+        run: uv run pytest
+      - name: Offline benchmark (scripted expert, no API key)
+        run: uv run opspilot bench --configs oracle --run-id ci-oracle
+
+  kind-e2e:
+    # Real Kubernetes: deploy the app on kind, inject every fault, verify the fixes.
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: helm/kind-action@v1
+        with:
+          cluster_name: opspilot
+      - run: uv sync
+      - run: uv run opspilot bench --backend kind --configs oracle --run-id ci-kind-oracle
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kind-oracle-report
+          path: results/ci-kind-oracle/
+
+  agent-benchmark:
+    # Live LLM benchmark; runs only when the repository has a GROQ_API_KEY secret.
+    runs-on: ubuntu-latest
+    needs: test
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    env:
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+      - name: Benchmark (skipped without secret)
+        if: ${{ env.GROQ_API_KEY != '' }}
+        run: uv run opspilot bench --configs cascade --run-id ci-cascade --pause 2
+      - uses: actions/upload-artifact@v4
+        if: ${{ env.GROQ_API_KEY != '' }}
+        with:
+          name: agent-report
+          path: results/ci-cascade/
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t opspilot:ci .
+      - run: docker run --rm opspilot:ci scenarios

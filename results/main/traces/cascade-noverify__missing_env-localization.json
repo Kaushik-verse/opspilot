@@ -1,0 +1,78 @@
+{
+  "summary": {
+    "episode": "missing_env-localization",
+    "scenario": "missing_env",
+    "task": "localization",
+    "config": "cascade-noverify",
+    "success": true,
+    "answer": [
+      "user"
+    ],
+    "detail": "top-1 'user', expected 'user' (submitted ['user'])",
+    "steps": 4,
+    "small_tokens": 1678,
+    "large_tokens": 2811,
+    "llm_calls": 4,
+    "escalated": true,
+    "escalation_reason": "guardrail block",
+    "blocked_actions": 1,
+    "format_errors": 0,
+    "writes": 0,
+    "wall_s": 15.347364500000367,
+    "llm_s": 1.613558124001429,
+    "error": "",
+    "total_tokens": 4489
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 563,
+      "latency_s": 0.19,
+      "response": "```\nexec_shell(\"kubectl get pods -n hotel-reservation -o wide\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pods -n hotel-reservation -o wide",
+      "guardrail": "read",
+      "observation": "NAME                                     READY   STATUS             RESTARTS      AGE   IP             NODE           NOMINATED NODE   READINESS GATES\nfrontend-4dc6abb6e-fd83b                 1/1     Running            0             42m   10.244.1.147   kind-worker2   <none>           <none>\nsearch-c179abadc-6cfc4                   1/1     Running            0             42m   10.244.2.165   kind-worker2   <none>           <none>\ngeo-f4b9f2896-d3b50                      1/1     Running            0             42m   10.244.1.138   kind-worker    <none>           <none>\nrate-cd21c2450-1321d                     1/1     Running            0             42m   10.244.1.224   kind-worker    <none>           <none>\nprofile-d2ab717b5-8748a                  1/1     Running            0             42m   10.244.1.165   kind-worker2   <none>           <none>\nrecommendation-c829feafe-40309           1/1     Running            0             42m   10.244.1.106   kind-worker2   <none>           <none>\nreservation-657541b01-4bee0              1/1     Running            0             42m   10.244.1.118   kind-worker    <none>           <none>\nuser-6f7e9fda0-ca28d                     0/1     CrashLoopBackOff   6 (31s ago)   15s   10.244.2.11    kind-worker2   <none>           <none>\nmongodb-geo-bfc840abb-c98db              1/1     Running            0             42m   10.244.1.64    kind-worker2   <none>           <none>\nmongodb-rate-230f5c1f9-1ec6c             1/1     Running            0             42m   10.244.2.132   kind-worker    <none>           <none>\nmongodb-profile-e174becf9-60a15          1/1     Running            0             42m   10.244.1.82    kind-worker2   <none>           <none>\nmongodb-recommendation-a35e4dea7-d2d46   1/1     Running            0             42m   10.244.1.27    kind-worker    <none>           <none>\nmongodb-reservation-a7f1d70d8-af973      1/1     Running            0             42m   10.244.1.151   kind-worker    <none>           <none>\nmongodb-user-eff0da4a6-42cdc             1/1     Running            0             42m   10.244.2.59    kind-worker    <none>           <none>"
+    },
+    {
+      "step": 2,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1115,
+      "latency_s": 0.53,
+      "response": "```\nexec_shell(\"echo test\")\n```",
+      "action": "exec_shell",
+      "command": "echo test",
+      "guardrail": "BLOCKED: only kubectl is allowed (got 'echo'); no curl, bash, or package tools",
+      "observation": "BLOCKED by OpsPilot guardrail: only kubectl is allowed (got 'echo'); no curl, bash, or package tools"
+    },
+    {
+      "step": 3,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1356,
+      "latency_s": 0.54,
+      "response": "```\nexec_shell(\"kubectl logs user-6f7e9fda0-ca28d -n hotel-reservation --previous\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl logs user-6f7e9fda0-ca28d -n hotel-reservation --previous",
+      "guardrail": "read",
+      "observation": "level=info msg=\"starting user service\" port=8086\nlevel=fatal msg=\"invalid configuration\" error=\"required environment variable DB_URL is not set\"\npanic: config: missing required setting\n\ngoroutine 1 [running]:\nmain.main()\n\t/go/src/hotel/user/main.go:47 +0x2f1"
+    },
+    {
+      "step": 4,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1455,
+      "latency_s": 0.35,
+      "response": "submit([\"user\"])",
+      "action": "submit",
+      "warning": "action written without a code block",
+      "answer": [
+        "user"
+      ],
+      "observation": "[evaluation] SUCCESS: top-1 'user', expected 'user' (submitted ['user'])"
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "summary": {
+    "episode": "node_selector-localization",
+    "scenario": "node_selector",
+    "task": "localization",
+    "config": "cascade",
+    "success": true,
+    "answer": [
+      "reservation"
+    ],
+    "detail": "top-1 'reservation', expected 'reservation' (submitted ['reservation'])",
+    "steps": 6,
+    "small_tokens": 8323,
+    "large_tokens": 0,
+    "llm_calls": 6,
+    "escalated": false,
+    "escalation_reason": "",
+    "blocked_actions": 0,
+    "format_errors": 0,
+    "writes": 0,
+    "wall_s": 61.504229916999975,
+    "llm_s": 5.0192080849992635,
+    "error": "",
+    "total_tokens": 8323
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 563,
+      "latency_s": 1.0,
+      "response": "```\nexec_shell(\"kubectl get pods -n hotel-reservation -o wide\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pods -n hotel-reservation -o wide",
+      "guardrail": "read",
+      "observation": "NAME                                     READY   STATUS    RESTARTS   AGE   IP             NODE           NOMINATED NODE   READINESS GATES\nfrontend-4dc6abb6e-fd83b                 1/1     Running   0          42m   10.244.1.147   kind-worker2   <none>           <none>\nsearch-c179abadc-6cfc4                   1/1     Running   0          42m   10.244.2.165   kind-worker2   <none>           <none>\ngeo-f4b9f2896-d3b50                      1/1     Running   0          42m   10.244.1.138   kind-worker    <none>           <none>\nrate-cd21c2450-1321d                     1/1     Running   0          42m   10.244.1.224   kind-worker    <none>           <none>\nprofile-d2ab717b5-8748a                  1/1     Running   0          42m   10.244.1.165   kind-worker2   <none>           <none>\nrecommendation-c829feafe-40309           1/1     Running   0          42m   10.244.1.106   kind-worker2   <none>           <none>\nreservation-f0e70c40b-0e6f0              0/1     Pending   0          15s   <none>         <none>         <none>           <none>\nuser-47b43b1dc-6848d                     1/1     Running   0          42m   10.244.2.49    kind-worker2   <none>           <none>\nmongodb-geo-bfc840abb-c98db              1/1     Running   0          42m   10.244.1.64    kind-worker2   <none>           <none>\nmongodb-rate-230f5c1f9-1ec6c             1/1     Running   0          42m   10.244.2.132   kind-worker    <none>           <none>\nmongodb-profile-e174becf9-60a15          1/1     Running   0          42m   10.244.1.82    kind-worker2   <none>           <none>\nmongodb-recommendation-a35e4dea7-d2d46   1/1     Running   0          42m   10.244.1.27    kind-worker    <none>           <none>\nmongodb-reservation-a7f1d70d8-af973      1/1     Running   0          42m   10.244.1.151   kind-worker    <none>           <none>\nmongodb-user-eff0da4a6-42cdc             1/1     Running   0          42m   10.244.2.59    kind-worker    <none>           <none>"
+    },
+    {
+      "step": 2,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1091,
+      "latency_s": 0.62,
+      "response": "```\nexec_shell(\"kubectl get events -n hotel-reservation --sort-by='.metadata.creationTimestamp' | tail -n 20\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get events -n hotel-reservation --sort-by='.metadata.creationTimestamp' | tail -n 20",
+      "guardrail": "read",
+      "observation": "LAST SEEN   TYPE      REASON              OBJECT                            MESSAGE\n12s         Normal    ScalingReplicaSet   deployment/reservation            Scaled up replica set reservation-f0e70c40b to 1\n38s         Warning   FailedScheduling    pod/reservation-f0e70c40b-0e6f0   0/3 nodes are available: 1 node(s) had untolerated taint {node-role.kubernetes.io/control-plane: }, 2 node(s) didn't match Pod's node affinity/selector. preemption: 0/3 nodes are available: 3 Preemption is not helpful for scheduling."
+    },
+    {
+      "step": 3,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1469,
+      "latency_s": 1.62,
+      "response": "```\nexec_shell(\"kubectl describe deployment reservation -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl describe deployment reservation -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "Name:                   reservation\nNamespace:              hotel-reservation\nLabels:                 app=reservation\nAnnotations:            deployment.kubernetes.io/revision: 2\nSelector:               app=reservation\nReplicas:               1 desired | 1 updated | 1 total | 0 available | 1 unavailable\nStrategyType:           RollingUpdate\nPod Template:\n  Labels:  app=reservation\n  Containers:\n   reservation:\n    Image:      opspilot/hotel-reservation:1.4.2\n    Port:       8087/TCP\n    Environment:\n      SERVICE_PORT:  8087\n      LOG_LEVEL:  info\n      DB_URL:  mongodb://mongodb-reservation:27017/reservation\n  Node-Selectors:  kubernetes.io/hostname=gpu-node-7\nConditions:\n  Type           Status  Reason\n  Available      False   MinimumReplicasUnavailable"
+    },
+    {
+      "step": 4,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1662,
+      "latency_s": 0.53,
+      "response": "```\nsubmit([\"reservation\"])\n```",
+      "action": "submit",
+      "answer": [
+        "reservation"
+      ],
+      "observation": "Self-check before your answer is recorded: you have not yet checked service endpoints (kubectl get endpoints); application logs (kubectl logs). Check them now, then submit again (the same answer if it still holds, or a corrected one)."
+    },
+    {
+      "step": 5,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1515,
+      "latency_s": 0.62,
+      "response": "```\nexec_shell(\"kubectl get endpoints -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get endpoints -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "NAME                     ENDPOINTS            AGE\nfrontend                 10.244.1.147:5000    42m\nsearch                   10.244.2.165:8082    42m\ngeo                      10.244.1.138:8083    42m\nrate                     10.244.1.224:8084    42m\nprofile                  10.244.1.165:8081    42m\nrecommendation           10.244.1.106:8085    42m\nreservation              <none>               42m\nuser                     10.244.2.49:8086     42m\nmongodb-geo              10.244.1.64:27017    42m\nmongodb-rate             10.244.2.132:27017   42m\nmongodb-profile          10.244.1.82:27017    42m\nmongodb-recommendation   10.244.1.27:27017    42m\nmongodb-reservation      10.244.1.151:27017   42m\nmongodb-user             10.244.2.59:27017    42m"
+    },
+    {
+      "step": 6,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 2023,
+      "latency_s": 0.63,
+      "response": "```\nsubmit([\"reservation\"])\n```",
+      "action": "submit",
+      "answer": [
+        "reservation"
+      ],
+      "observation": "[evaluation] SUCCESS: top-1 'reservation', expected 'reservation' (submitted ['reservation'])"
+    }
+  ]
+}

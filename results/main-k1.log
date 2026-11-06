@@ -1,0 +1,25 @@
+skip  cascade-noverify  scale_zero-detection (already done)
+PASS  cascade-noverify  scale_zero-localization      steps= 6 tokens=  7700  
+skip  cascade-noverify  scale_zero-mitigation (already done)
+PASS  cascade-noverify  target_port-detection        steps=10 tokens= 19929 (escalated: no answer after 8 steps) 
+PASS  cascade-noverify  target_port-localization     steps= 8 tokens= 14621  
+FAIL  cascade-noverify  target_port-mitigation       steps=15 tokens= 33557 (escalated: guardrail block) 
+skip  cascade-noverify  bad_image-detection (already done)
+PASS  cascade-noverify  bad_image-localization       steps= 3 tokens=  3285  
+PASS  cascade-noverify  bad_image-mitigation         steps= 7 tokens=  7296  
+PASS  cascade-noverify  node_selector-detection      steps= 4 tokens=  4772  
+PASS  cascade-noverify  node_selector-localization   steps= 4 tokens=  4785  
+PASS  cascade-noverify  node_selector-mitigation     steps= 9 tokens= 13406 (escalated: repeated command) 
+PASS  cascade-noverify  missing_env-detection        steps= 6 tokens= 10580 (escalated: guardrail block) 
+PASS  cascade-noverify  missing_env-localization     steps= 4 tokens=  4489 (escalated: guardrail block) 
+PASS  cascade-noverify  missing_env-mitigation       steps= 7 tokens=  8444  
+PASS  cascade-noverify  healthy-detection            steps= 5 tokens=  7471  
+
+| Config | Overall | Detection | Localization | Mitigation | Avg steps | Tokens / episode | Large-model token share | Guardrail blocks |
+|---|---|---|---|---|---|---|---|---|
+| `cascade` | **94%** | 100% | 100% | 80% | 7.8 | 12,427 | 36% | 3 |
+| `cascade-noverify` | **94%** | 100% | 100% | 80% | 6.5 | 10,076 | 39% | 4 |
+
+run: `main` · backend: `sim` · small model: `openai/gpt-oss-20b` · large model: `openai/gpt-oss-120b` · max steps: `15` · python: `3.11.8`
+
+Report: results/main/report.html

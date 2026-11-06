@@ -1,0 +1,108 @@
+{
+  "summary": {
+    "episode": "scale_zero-mitigation",
+    "scenario": "scale_zero",
+    "task": "mitigation",
+    "config": "small",
+    "success": true,
+    "answer": null,
+    "detail": "cluster healthy",
+    "steps": 7,
+    "small_tokens": 8038,
+    "large_tokens": 0,
+    "llm_calls": 7,
+    "escalated": false,
+    "escalation_reason": "",
+    "blocked_actions": 1,
+    "format_errors": 0,
+    "writes": 1,
+    "wall_s": 8.047699292001198,
+    "llm_s": 5.087106916998891,
+    "error": "",
+    "total_tokens": 8038
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 601,
+      "latency_s": 0.58,
+      "response": "```\nexec_shell(\"kubectl get deployments -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get deployments -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "NAME                     READY   UP-TO-DATE   AVAILABLE   AGE\nfrontend                 1/1     1            1           42m\nsearch                   1/1     1            1           42m\ngeo                      1/1     1            1           42m\nrate                     1/1     1            1           42m\nprofile                  0/0     0            0           42m\nrecommendation           1/1     1            1           42m\nreservation              1/1     1            1           42m\nuser                     1/1     1            1           42m\nmongodb-geo              1/1     1            1           42m\nmongodb-rate             1/1     1            1           42m\nmongodb-profile          1/1     1            1           42m\nmongodb-recommendation   1/1     1            1           42m\nmongodb-reservation      1/1     1            1           42m\nmongodb-user             1/1     1            1           42m"
+    },
+    {
+      "step": 2,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 851,
+      "latency_s": 0.51,
+      "response": "```\nexec_shell(\"echo test\")\n```",
+      "action": "exec_shell",
+      "command": "echo test",
+      "guardrail": "BLOCKED: only kubectl is allowed (got 'echo'); no curl, bash, or package tools",
+      "observation": "BLOCKED by OpsPilot guardrail: only kubectl is allowed (got 'echo'); no curl, bash, or package tools"
+    },
+    {
+      "step": 3,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 981,
+      "latency_s": 1.0,
+      "response": "```\nexec_shell(\"kubectl describe deployment profile -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl describe deployment profile -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "Name:                   profile\nNamespace:              hotel-reservation\nLabels:                 app=profile\nAnnotations:            deployment.kubernetes.io/revision: 1\nSelector:               app=profile\nReplicas:               0 desired | 0 updated | 0 total | 0 available | 0 unavailable\nStrategyType:           RollingUpdate\nPod Template:\n  Labels:  app=profile\n  Containers:\n   profile:\n    Image:      opspilot/hotel-profile:1.4.2\n    Port:       8081/TCP\n    Environment:\n      SERVICE_PORT:  8081\n      LOG_LEVEL:  info\n      DB_URL:  mongodb://mongodb-profile:27017/profile\n  Node-Selectors:  <none>\nConditions:\n  Type           Status  Reason\n  Available      True    MinimumReplicasAvailable"
+    },
+    {
+      "step": 4,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1173,
+      "latency_s": 1.21,
+      "response": "```\nexec_shell(\"kubectl scale deployment profile --replicas=1 -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl scale deployment profile --replicas=1 -n hotel-reservation",
+      "guardrail": "write",
+      "observation": "deployment.apps/profile scaled"
+    },
+    {
+      "step": 5,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1122,
+      "latency_s": 0.88,
+      "response": "```\nexec_shell(\"kubectl get pods -n hotel-reservation -l app=profile -o wide\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pods -n hotel-reservation -l app=profile -o wide",
+      "guardrail": "read",
+      "observation": "NAME                      READY   STATUS    RESTARTS   AGE   IP             NODE           NOMINATED NODE   READINESS GATES\nprofile-d2ab717b5-8748a   1/1     Running   0          15s   10.244.1.165   kind-worker2   <none>           <none>"
+    },
+    {
+      "step": 6,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1290,
+      "latency_s": 0.35,
+      "response": "```\nsubmit()\n```",
+      "action": "submit",
+      "answer": null,
+      "observation": "Pre-submit verification (OpsPilot runs this automatically before closing a mitigation):\n$ kubectl get pods -n hotel-reservation\nNAME                                     READY   STATUS    RESTARTS   AGE\nfrontend-4dc6abb6e-fd83b                 1/1     Running   0          42m\nsearch-c179abadc-6cfc4                   1/1     Running   0          42m\ngeo-f4b9f2896-d3b50                      1/1     Running   0          42m\nrate-cd21c2450-1321d                     1/1     Running   0          42m\nprofile-d2ab717b5-8748a                  1/1     Running   0          15s\nrecommendation-c829feafe-40309           1/1     Running   0          42m\nreservation-657541b01-4bee0              1/1     Running   0          42m\nuser-47b43b1dc-6848d                     1/1     Running   0          42m\nmongodb-geo-bfc840abb-c98db              1/1     Running   0          42m\nmongodb-rate-230f5c1f9-1ec6c             1/1     Running   0          42m\nmongodb-profile-e174becf9-60a15          1/1     Running   0          42m\nmongodb-recommendation-a35e4dea7-d2d46   1/1     Running   0          42m\nmongodb-reservation-a7f1d70d8-af973      1/1     Running   0          42m\nmongodb-user-eff0da4a6-42cdc             1/1     Running   0          42m\n$ kubectl get endpoints -n hotel-reservation\nNAME                     ENDPOINTS            AGE\nfrontend                 10.244.1.147:5000    42m\nsearch                   10.244.2.165:8082    42m\ngeo                      10.244.1.138:8083    42m\nrate                     10.244.1.224:8084    42m\nprofile                  10.244.1.165:8081    42m\nrecommendation           10.244.1.106:8085    42m\nreservation              10.244.1.118:8087    42m\nuser                     10.244.2.49:8086     42m\nmongodb-geo              10.244.1.64:27017    42m\nmongodb-rate             10.244.2.132:27017   42m\nmongodb-profile          10.244.1.82:27017    42m\nmongodb-recommendation   10.244.1.27:27017    42m\nmongodb-reservation      10.244.1.151:27017   42m\nmongodb-user             10.244.2.59:27017    42m\nIf every pod is 1/1 Running and every service has endpoints on the right port, call submit() again. Otherwise keep fixing."
+    },
+    {
+      "step": 7,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 2020,
+      "latency_s": 0.55,
+      "response": "```\nsubmit()\n```",
+      "action": "submit",
+      "answer": null,
+      "observation": "[evaluation] SUCCESS: cluster healthy"
+    }
+  ]
+}

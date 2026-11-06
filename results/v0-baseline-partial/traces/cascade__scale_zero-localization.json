@@ -1,0 +1,65 @@
+{
+  "summary": {
+    "episode": "scale_zero-localization",
+    "scenario": "scale_zero",
+    "task": "localization",
+    "config": "cascade",
+    "success": true,
+    "answer": [
+      "profile"
+    ],
+    "detail": "top-1 'profile', expected 'profile' (submitted ['profile'])",
+    "steps": 3,
+    "small_tokens": 2851,
+    "large_tokens": 0,
+    "llm_calls": 3,
+    "escalated": false,
+    "escalation_reason": "",
+    "blocked_actions": 0,
+    "format_errors": 0,
+    "writes": 0,
+    "wall_s": 17.46754450000026,
+    "llm_s": 1.3520023749988468,
+    "error": "",
+    "total_tokens": 2851
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 527,
+      "latency_s": 0.46,
+      "response": "(recovered tool call)\n```\nexec_shell(\"kubectl get pods -n hotel-reservation -o wide\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pods -n hotel-reservation -o wide",
+      "guardrail": "read",
+      "observation": "NAME                                     READY   STATUS    RESTARTS   AGE   IP             NODE           NOMINATED NODE   READINESS GATES\nfrontend-4dc6abb6e-fd83b                 1/1     Running   0          42m   10.244.1.147   kind-worker2   <none>           <none>\nsearch-c179abadc-6cfc4                   1/1     Running   0          42m   10.244.2.165   kind-worker2   <none>           <none>\ngeo-f4b9f2896-d3b50                      1/1     Running   0          42m   10.244.1.138   kind-worker    <none>           <none>\nrate-cd21c2450-1321d                     1/1     Running   0          42m   10.244.1.224   kind-worker    <none>           <none>\nrecommendation-c829feafe-40309           1/1     Running   0          42m   10.244.1.106   kind-worker2   <none>           <none>\nreservation-657541b01-4bee0              1/1     Running   0          42m   10.244.1.118   kind-worker    <none>           <none>\nuser-47b43b1dc-6848d                     1/1     Running   0          42m   10.244.2.49    kind-worker2   <none>           <none>\nmongodb-geo-bfc840abb-c98db              1/1     Running   0          42m   10.244.1.64    kind-worker2   <none>           <none>\nmongodb-rate-230f5c1f9-1ec6c             1/1     Running   0          42m   10.244.2.132   kind-worker    <none>           <none>\nmongodb-profile-e174becf9-60a15          1/1     Running   0          42m   10.244.1.82    kind-worker2   <none>           <none>\nmongodb-recommendation-a35e4dea7-d2d46   1/1     Running   0          42m   10.244.1.27    kind-worker    <none>           <none>\nmongodb-reservation-a7f1d70d8-af973      1/1     Running   0          42m   10.244.1.151   kind-worker    <none>           <none>\nmongodb-user-eff0da4a6-42cdc             1/1     Running   0          42m   10.244.2.59    kind-worker    <none>           <none>"
+    },
+    {
+      "step": 2,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1027,
+      "latency_s": 0.53,
+      "response": "(recovered tool call)\n```\nexec_shell(\"kubectl get events -n hotel-reservation --sort-by=.metadata.creationTimestamp | tail -n 20\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get events -n hotel-reservation --sort-by=.metadata.creationTimestamp | tail -n 20",
+      "guardrail": "read",
+      "observation": "LAST SEEN   TYPE     REASON              OBJECT               MESSAGE\n12s         Normal   ScalingReplicaSet   deployment/profile   Scaled down replica set profile-d2ab717b5 to 0 from 1"
+    },
+    {
+      "step": 3,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1297,
+      "latency_s": 0.37,
+      "response": "```\nsubmit([\"profile\"])\n```",
+      "action": "submit",
+      "answer": [
+        "profile"
+      ],
+      "observation": "[evaluation] SUCCESS: top-1 'profile', expected 'profile' (submitted ['profile'])"
+    }
+  ]
+}

@@ -1,0 +1,838 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>OpsPilot Benchmark</title>
+<style>
+:root{--bg:#fbfaf7;--fg:#1f2328;--mut:#5d6470;--card:#fff;--line:#e3e1db;--c0:#8a6fd1;--c1:#2f9e8f;--c2:#d98a2b;--c3:#3b82c4;--c4:#9aa0a6;--ok:#1a7f4b;--bad:#b42318}
+@media (prefers-color-scheme:dark){:root{--bg:#15171a;--fg:#e8e6e1;--mut:#9aa0a6;--card:#1d2024;--line:#30343a;--ok:#4cc38a;--bad:#f97066}}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1040px;margin:0 auto;padding:28px 16px 60px} h1{margin:0 0 4px;font-size:26px} .sub{color:var(--mut);margin:0 0 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin:0 0 18px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px} th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line);white-space:nowrap} th{color:var(--mut);font-weight:600}
+.chart{width:100%;height:auto} .grid{stroke:var(--line)} .tick,.lbl{fill:var(--mut);font-size:12px}
+.s0{fill:var(--c0);background:var(--c0)} .s1{fill:var(--c1);background:var(--c1)} .s2{fill:var(--c2);background:var(--c2)} .s3{fill:var(--c3);background:var(--c3)} .s4{fill:var(--c4);background:var(--c4)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--mut)} .key i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+.ep{border-top:1px solid var(--line);padding:8px 0} .ep>summary{cursor:pointer} .det{color:var(--mut);margin-left:8px;font-size:13px}
+.badge{font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;color:#fff} .pass{background:var(--ok)} .fail{background:var(--bad)}
+.step{margin:8px 0 0 18px} .tier{font-size:11px;padding:1px 5px;border-radius:4px;border:1px solid var(--line)} .tier.large{border-color:var(--c2);color:var(--c2)}
+.blk{color:var(--bad);font-size:12px;margin-left:6px} code{font-size:12.5px} pre{white-space:pre-wrap;word-break:break-word;font-size:12px;background:var(--bg);padding:8px;border-radius:6px;border:1px solid var(--line);max-height:320px;overflow:auto} .obs{color:var(--mut)}
+</style></head><body><main>
+<h1>OpsPilot benchmark</h1><p class="sub">run: <code>kind-oracle</code> · backend: <code>kind</code> · small model: <code>scripted expert (no LLM)</code> · large model: <code>scripted expert (no LLM)</code> · max steps: <code>15</code> · python: <code>3.11.8</code></p>
+<div class="card"><table><thead><tr><th>Config</th><th>Overall</th><th>Detection</th><th>Localization</th><th>Mitigation</th><th>Avg steps</th><th>Tokens / episode</th><th>Large-model share</th><th>Guardrail blocks</th></tr></thead><tbody><tr><td><code>oracle</code></td><td><b>100%</b></td><td>100%</td><td>100%</td><td>100%</td><td>3.6</td><td>3,363</td><td>0%</td><td>0</td></tr></tbody></table></div>
+<div class="card"><svg viewBox="0 0 760 280" role="img" aria-label="Success rate by task and configuration" class="chart"><line x1="44" x2="750" y1="240.0" y2="240.0" class="grid"/><text x="36" y="244.0" class="tick" text-anchor="end">0%</text><line x1="44" x2="750" y1="184.0" y2="184.0" class="grid"/><text x="36" y="188.0" class="tick" text-anchor="end">25%</text><line x1="44" x2="750" y1="128.0" y2="128.0" class="grid"/><text x="36" y="132.0" class="tick" text-anchor="end">50%</text><line x1="44" x2="750" y1="72.0" y2="72.0" class="grid"/><text x="36" y="76.0" class="tick" text-anchor="end">75%</text><line x1="44" x2="750" y1="16.0" y2="16.0" class="grid"/><text x="36" y="20.0" class="tick" text-anchor="end">100%</text><rect x="119.2" y="16.0" width="22.0" height="224.0" rx="2" class="s0"><title>oracle · detection: 100%</title></rect><text x="132.2" y="266" class="lbl" text-anchor="middle">detection</text><rect x="295.8" y="16.0" width="22.0" height="224.0" rx="2" class="s0"><title>oracle · localization: 100%</title></rect><text x="308.8" y="266" class="lbl" text-anchor="middle">localization</text><rect x="472.2" y="16.0" width="22.0" height="224.0" rx="2" class="s0"><title>oracle · mitigation: 100%</title></rect><text x="485.2" y="266" class="lbl" text-anchor="middle">mitigation</text><rect x="648.8" y="16.0" width="22.0" height="224.0" rx="2" class="s0"><title>oracle · overall: 100%</title></rect><text x="661.8" y="266" class="lbl" text-anchor="middle">overall</text></svg><div class="legend"><span class="key"><i class="s0"></i>oracle</span></div></div>
+<div class="card"><h2 style="margin-top:0;font-size:18px">Episodes &amp; agent traces</h2><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · bad_image-detection · 3 steps · 2,484 tokens<span class="det">answered yes, expected yes</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS             RESTARTS   AGE
+frontend-7955ddff9d-9dpqm                 1/1     Running            0          39s
+geo-5c966bd4b6-m8rbf                      1/1     Running            0          39s
+mongodb-geo-869c7f74df-lwr26              1/1     Running            0          38s
+mongodb-profile-598f774585-qgpdt          1/1     Running            0          38s
+mongodb-rate-76c44597b9-6kzps             1/1     Running            0          38s
+mongodb-recommendation-7c78b5c747-98gts   1/1     Running            0          38s
+mongodb-reservation-77b6f86b89-mxwcx      1/1     Running            0          37s
+mongodb-user-97596fd87-7sljg              1/1     Running            0          37s
+profile-644898ffcd-58thk                  1/1     Running            0          39s
+rate-7cdc79d68f-lqtz9                     1/1     Running            0          39s
+rate-95f444767-clg5k                      0/1     ImagePullBackOff   0          26s
+recommendation-67d95776bb-6nxws           1/1     Running            0          39s
+reservation-d6998c8bc-494nx               1/1     Running            0          38s
+search-565b58db8-cssv5                    1/1     Running            0          39s
+user-65448db4cb-cb56s                     1/1     Running            0          38s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.104:5000    39s
+geo                      10.244.0.106:8083    39s
+mongodb-geo              10.244.0.111:27017   38s
+mongodb-profile          10.244.0.114:27017   38s
+mongodb-rate             10.244.0.113:27017   38s
+mongodb-recommendation   10.244.0.115:27017   38s
+mongodb-reservation      10.244.0.116:27017   38s
+mongodb-user             10.244.0.117:27017   38s
+profile                  10.244.0.107:8081    39s
+rate                     10.244.0.112:8084    39s
+recommendation           10.244.0.108:8085    39s
+reservation              10.244.0.109:8087    38s
+search                   10.244.0.105:8082    39s
+user                     10.244.0.110:8086    38s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>submit(&#x27;Yes&#x27;)</code> </div><details><summary>reasoning &amp; output</summary><pre>Decide.
+```
+submit(&quot;Yes&quot;)
+```</pre><pre class="obs">[evaluation] SUCCESS: answered yes, expected yes</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · bad_image-localization · 3 steps · 2,479 tokens<span class="det">top-1 &#x27;rate&#x27;, expected &#x27;rate&#x27; (submitted [&#x27;rate&#x27;])</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS             RESTARTS   AGE
+frontend-7955ddff9d-jk77l                 1/1     Running            0          38s
+geo-5c966bd4b6-hpttl                      1/1     Running            0          38s
+mongodb-geo-869c7f74df-gkztb              1/1     Running            0          38s
+mongodb-profile-598f774585-59tnl          1/1     Running            0          37s
+mongodb-rate-76c44597b9-j9d4q             1/1     Running            0          37s
+mongodb-recommendation-7c78b5c747-rdw8x   1/1     Running            0          37s
+mongodb-reservation-77b6f86b89-gmskp      1/1     Running            0          37s
+mongodb-user-97596fd87-b5nzk              1/1     Running            0          37s
+profile-644898ffcd-pxxkd                  1/1     Running            0          38s
+rate-7cdc79d68f-6ldcl                     1/1     Running            0          38s
+rate-95f444767-6d5q4                      0/1     ImagePullBackOff   0          25s
+recommendation-67d95776bb-h6jp2           1/1     Running            0          38s
+reservation-d6998c8bc-kgpzn               1/1     Running            0          38s
+search-565b58db8-dxxj4                    1/1     Running            0          38s
+user-65448db4cb-xrnvx                     1/1     Running            0          38s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.119:5000    38s
+geo                      10.244.0.121:8083    38s
+mongodb-geo              10.244.0.127:27017   38s
+mongodb-profile          10.244.0.129:27017   38s
+mongodb-rate             10.244.0.128:27017   38s
+mongodb-recommendation   10.244.0.130:27017   38s
+mongodb-reservation      10.244.0.131:27017   38s
+mongodb-user             10.244.0.132:27017   38s
+profile                  10.244.0.123:8081    38s
+rate                     10.244.0.122:8084    38s
+recommendation           10.244.0.124:8085    38s
+reservation              10.244.0.125:8087    38s
+search                   10.244.0.120:8082    38s
+user                     10.244.0.126:8086    38s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>submit([&#x27;rate&#x27;])</code> </div><details><summary>reasoning &amp; output</summary><pre>Root cause identified.
+```
+submit([&quot;rate&quot;])
+```</pre><pre class="obs">[evaluation] SUCCESS: top-1 &#x27;rate&#x27;, expected &#x27;rate&#x27; (submitted [&#x27;rate&#x27;])</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · bad_image-mitigation · 5 steps · 5,577 tokens<span class="det">cluster healthy</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS             RESTARTS   AGE
+frontend-7955ddff9d-j48vg                 1/1     Running            0          39s
+geo-5c966bd4b6-89bmz                      1/1     Running            0          39s
+mongodb-geo-869c7f74df-flvzj              1/1     Running            0          38s
+mongodb-profile-598f774585-l7gkm          1/1     Running            0          38s
+mongodb-rate-76c44597b9-v5gfp             1/1     Running            0          38s
+mongodb-recommendation-7c78b5c747-ffqp7   1/1     Running            0          37s
+mongodb-reservation-77b6f86b89-c58jv      1/1     Running            0          37s
+mongodb-user-97596fd87-zlcg8              1/1     Running            0          37s
+profile-644898ffcd-xwd76                  1/1     Running            0          38s
+rate-7cdc79d68f-6hzmw                     1/1     Running            0          38s
+rate-95f444767-v9x62                      0/1     ImagePullBackOff   0          25s
+recommendation-67d95776bb-kkp2n           1/1     Running            0          38s
+reservation-d6998c8bc-nczht               1/1     Running            0          38s
+search-565b58db8-dq8ps                    1/1     Running            0          39s
+user-65448db4cb-6vsvt                     1/1     Running            0          38s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.134:5000    39s
+geo                      10.244.0.136:8083    38s
+mongodb-geo              10.244.0.142:27017   38s
+mongodb-profile          10.244.0.144:27017   38s
+mongodb-rate             10.244.0.143:27017   38s
+mongodb-recommendation   10.244.0.145:27017   38s
+mongodb-reservation      10.244.0.146:27017   38s
+mongodb-user             10.244.0.147:27017   38s
+profile                  10.244.0.138:8081    38s
+rate                     10.244.0.137:8084    38s
+recommendation           10.244.0.139:8085    38s
+reservation              10.244.0.140:8087    38s
+search                   10.244.0.135:8082    39s
+user                     10.244.0.141:8086    38s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>kubectl rollout undo deployment/rate -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Apply the minimal fix.
+```
+exec_shell(&quot;kubectl rollout undo deployment/rate -n hotel-reservation&quot;)
+```</pre><pre class="obs">deployment.apps/rate rolled back</pre></details></div><div class="step"><div class="sh"><b>#4</b> <span class="tier small">small</span> <code>submit(None)</code> </div><details><summary>reasoning &amp; output</summary><pre>Done; submit (harness verifies first).
+```
+submit()
+```</pre><pre class="obs">Pre-submit verification (OpsPilot runs this automatically before closing a mitigation):
+$ kubectl get pods -n hotel-reservation
+NAME                                      READY   STATUS        RESTARTS   AGE
+frontend-7955ddff9d-j48vg                 1/1     Running       0          39s
+geo-5c966bd4b6-89bmz                      1/1     Running       0          39s
+mongodb-geo-869c7f74df-flvzj              1/1     Running       0          38s
+mongodb-profile-598f774585-l7gkm          1/1     Running       0          38s
+mongodb-rate-76c44597b9-v5gfp             1/1     Running       0          38s
+mongodb-recommendation-7c78b5c747-ffqp7   1/1     Running       0          37s
+mongodb-reservation-77b6f86b89-c58jv      1/1     Running       0          37s
+mongodb-user-97596fd87-zlcg8              1/1     Running       0          37s
+profile-644898ffcd-xwd76                  1/1     Running       0          38s
+rate-7cdc79d68f-6hzmw                     1/1     Running       0          38s
+rate-95f444767-v9x62                      0/1     Terminating   0          25s
+recommendation-67d95776bb-kkp2n           1/1     Running       0          38s
+reservation-d6998c8bc-nczht               1/1     Running       0          38s
+search-565b58db8-dq8ps                    1/1     Running       0          39s
+user-65448db4cb-6vsvt                     1/1     Running       0          38s
+$ kubectl get endpoints -n hotel-reservation
+NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.134:5000    39s
+geo                      10.244.0.136:8083    38s
+mongodb-geo              10.244.0.142:27017   38s
+mongodb-profile          10.244.0.144:27017   38s
+mongodb-rate             10.244.0.143:27017   38s
+mongodb-recommendation   10.244.0.145:27017   38s
+mongodb-reservation      10.244.0.146:27017   38s
+mongodb-user             10.244.0.147:27017   38s
+profile                  10.244.0.138:8081    38s
+rate                     10.244.0.137:8084    38s
+recommendation           10.244.0.139:8085    38s
+reservation              10.244.0.140:8087    38s
+search                   10.244.0.135:8082    39s
+user                     10.244.0.141:8086    38s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+If every pod is 1/1 Running and every service has endpoints on the right port, call submit() again. Otherwise keep fixing.</pre></details></div><div class="step"><div class="sh"><b>#5</b> <span class="tier small">small</span> <code>submit(None)</code> </div><details><summary>reasoning &amp; output</summary><pre>Verified healthy.
+```
+submit()
+```</pre><pre class="obs">[evaluation] SUCCESS: cluster healthy</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · healthy-detection · 3 steps · 2,374 tokens<span class="det">answered no, expected no</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-lcnp8                 1/1     Running   0          14s
+geo-5c966bd4b6-l8w79                      1/1     Running   0          14s
+mongodb-geo-869c7f74df-bdhm6              1/1     Running   0          14s
+mongodb-profile-598f774585-z42sv          1/1     Running   0          13s
+mongodb-rate-76c44597b9-2p9bd             1/1     Running   0          13s
+mongodb-recommendation-7c78b5c747-ncbmc   1/1     Running   0          13s
+mongodb-reservation-77b6f86b89-pjs4r      1/1     Running   0          13s
+mongodb-user-97596fd87-jwtxg              1/1     Running   0          12s
+profile-644898ffcd-q44dx                  1/1     Running   0          14s
+rate-7cdc79d68f-lrhsm                     1/1     Running   0          14s
+recommendation-67d95776bb-j84ts           1/1     Running   0          14s
+reservation-d6998c8bc-6tx9f               1/1     Running   0          14s
+search-565b58db8-jqcvm                    1/1     Running   0          14s
+user-65448db4cb-kwktj                     1/1     Running   0          14s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.236:5000    14s
+geo                      10.244.0.237:8083    14s
+mongodb-geo              10.244.0.244:27017   14s
+mongodb-profile          10.244.0.246:27017   14s
+mongodb-rate             10.244.0.245:27017   14s
+mongodb-recommendation   10.244.0.247:27017   14s
+mongodb-reservation      10.244.0.248:27017   14s
+mongodb-user             10.244.0.249:27017   14s
+profile                  10.244.0.239:8081    14s
+rate                     10.244.0.238:8084    14s
+recommendation           10.244.0.240:8085    14s
+reservation              10.244.0.241:8087    14s
+search                   10.244.0.242:8082    14s
+user                     10.244.0.243:8086    14s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>submit(&#x27;No&#x27;)</code> </div><details><summary>reasoning &amp; output</summary><pre>Decide.
+```
+submit(&quot;No&quot;)
+```</pre><pre class="obs">[evaluation] SUCCESS: answered no, expected no</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · missing_env-detection · 3 steps · 2,500 tokens<span class="det">answered yes, expected yes</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS             RESTARTS     AGE
+frontend-7955ddff9d-6z29p                 1/1     Running            0            37s
+geo-5c966bd4b6-l2qp4                      1/1     Running            0            37s
+mongodb-geo-869c7f74df-tpvlp              1/1     Running            0            37s
+mongodb-profile-598f774585-2r68w          1/1     Running            0            36s
+mongodb-rate-76c44597b9-j825w             1/1     Running            0            37s
+mongodb-recommendation-7c78b5c747-zmbk4   1/1     Running            0            36s
+mongodb-reservation-77b6f86b89-l788k      1/1     Running            0            36s
+mongodb-user-97596fd87-5gfhf              1/1     Running            0            36s
+profile-644898ffcd-7dbbf                  1/1     Running            0            37s
+rate-7cdc79d68f-78kw4                     1/1     Running            0            37s
+recommendation-67d95776bb-fsxjj           1/1     Running            0            37s
+reservation-d6998c8bc-5nnc8               1/1     Running            0            37s
+search-565b58db8-sb4vm                    1/1     Running            0            37s
+user-65448db4cb-4x9wd                     1/1     Running            0            37s
+user-7cddb8795d-p9kz6                     0/1     CrashLoopBackOff   2 (9s ago)   25s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.191:5000    38s
+geo                      10.244.0.193:8083    38s
+mongodb-geo              10.244.0.200:27017   38s
+mongodb-profile          10.244.0.201:27017   38s
+mongodb-rate             10.244.0.198:27017   38s
+mongodb-recommendation   10.244.0.202:27017   38s
+mongodb-reservation      10.244.0.203:27017   38s
+mongodb-user             10.244.0.204:27017   38s
+profile                  10.244.0.195:8081    38s
+rate                     10.244.0.194:8084    38s
+recommendation           10.244.0.196:8085    38s
+reservation              10.244.0.199:8087    38s
+search                   10.244.0.192:8082    38s
+user                     10.244.0.197:8086    38s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>submit(&#x27;Yes&#x27;)</code> </div><details><summary>reasoning &amp; output</summary><pre>Decide.
+```
+submit(&quot;Yes&quot;)
+```</pre><pre class="obs">[evaluation] SUCCESS: answered yes, expected yes</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · missing_env-localization · 3 steps · 2,503 tokens<span class="det">top-1 &#x27;user&#x27;, expected &#x27;user&#x27; (submitted [&#x27;user&#x27;])</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS             RESTARTS      AGE
+frontend-7955ddff9d-r8qhr                 1/1     Running            0             38s
+geo-5c966bd4b6-p64vc                      1/1     Running            0             38s
+mongodb-geo-869c7f74df-kz5q8              1/1     Running            0             38s
+mongodb-profile-598f774585-cppxs          1/1     Running            0             38s
+mongodb-rate-76c44597b9-kwwj4             1/1     Running            0             38s
+mongodb-recommendation-7c78b5c747-clnkn   1/1     Running            0             37s
+mongodb-reservation-77b6f86b89-f88vt      1/1     Running            0             37s
+mongodb-user-97596fd87-52mzz              1/1     Running            0             37s
+profile-644898ffcd-sl58n                  1/1     Running            0             38s
+rate-7cdc79d68f-z5xdg                     1/1     Running            0             38s
+recommendation-67d95776bb-6zfz8           1/1     Running            0             38s
+reservation-d6998c8bc-5sczq               1/1     Running            0             38s
+search-565b58db8-mffxb                    1/1     Running            0             38s
+user-65448db4cb-m7chc                     1/1     Running            0             38s
+user-7cddb8795d-l9n5l                     0/1     CrashLoopBackOff   2 (11s ago)   26s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.206:5000    38s
+geo                      10.244.0.208:8083    38s
+mongodb-geo              10.244.0.214:27017   38s
+mongodb-profile          10.244.0.216:27017   38s
+mongodb-rate             10.244.0.215:27017   38s
+mongodb-recommendation   10.244.0.217:27017   38s
+mongodb-reservation      10.244.0.218:27017   38s
+mongodb-user             10.244.0.219:27017   38s
+profile                  10.244.0.210:8081    38s
+rate                     10.244.0.209:8084    38s
+recommendation           10.244.0.211:8085    38s
+reservation              10.244.0.212:8087    38s
+search                   10.244.0.207:8082    38s
+user                     10.244.0.213:8086    38s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>submit([&#x27;user&#x27;])</code> </div><details><summary>reasoning &amp; output</summary><pre>Root cause identified.
+```
+submit([&quot;user&quot;])
+```</pre><pre class="obs">[evaluation] SUCCESS: top-1 &#x27;user&#x27;, expected &#x27;user&#x27; (submitted [&#x27;user&#x27;])</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · missing_env-mitigation · 5 steps · 5,637 tokens<span class="det">cluster healthy</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS             RESTARTS      AGE
+frontend-7955ddff9d-rflxv                 1/1     Running            0             38s
+geo-5c966bd4b6-f69n5                      1/1     Running            0             38s
+mongodb-geo-869c7f74df-xjdd7              1/1     Running            0             38s
+mongodb-profile-598f774585-wgv9r          1/1     Running            0             37s
+mongodb-rate-76c44597b9-bzlhd             1/1     Running            0             38s
+mongodb-recommendation-7c78b5c747-2q9cx   1/1     Running            0             37s
+mongodb-reservation-77b6f86b89-x7w7z      1/1     Running            0             37s
+mongodb-user-97596fd87-8v96q              1/1     Running            0             37s
+profile-644898ffcd-qtb29                  1/1     Running            0             38s
+rate-7cdc79d68f-hn9tt                     1/1     Running            0             38s
+recommendation-67d95776bb-d6ddt           1/1     Running            0             38s
+reservation-d6998c8bc-6hchq               1/1     Running            0             38s
+search-565b58db8-ht4xg                    1/1     Running            0             38s
+user-65448db4cb-kgq2d                     1/1     Running            0             38s
+user-7cddb8795d-cgwt2                     0/1     CrashLoopBackOff   2 (10s ago)   25s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.221:5000    38s
+geo                      10.244.0.223:8083    38s
+mongodb-geo              10.244.0.227:27017   38s
+mongodb-profile          10.244.0.231:27017   38s
+mongodb-rate             10.244.0.228:27017   38s
+mongodb-recommendation   10.244.0.232:27017   38s
+mongodb-reservation      10.244.0.233:27017   38s
+mongodb-user             10.244.0.234:27017   38s
+profile                  10.244.0.225:8081    38s
+rate                     10.244.0.224:8084    38s
+recommendation           10.244.0.229:8085    38s
+reservation              10.244.0.226:8087    38s
+search                   10.244.0.222:8082    38s
+user                     10.244.0.230:8086    38s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>kubectl rollout undo deployment/user -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Apply the minimal fix.
+```
+exec_shell(&quot;kubectl rollout undo deployment/user -n hotel-reservation&quot;)
+```</pre><pre class="obs">deployment.apps/user rolled back</pre></details></div><div class="step"><div class="sh"><b>#4</b> <span class="tier small">small</span> <code>submit(None)</code> </div><details><summary>reasoning &amp; output</summary><pre>Done; submit (harness verifies first).
+```
+submit()
+```</pre><pre class="obs">Pre-submit verification (OpsPilot runs this automatically before closing a mitigation):
+$ kubectl get pods -n hotel-reservation
+NAME                                      READY   STATUS        RESTARTS      AGE
+frontend-7955ddff9d-rflxv                 1/1     Running       0             39s
+geo-5c966bd4b6-f69n5                      1/1     Running       0             39s
+mongodb-geo-869c7f74df-xjdd7              1/1     Running       0             39s
+mongodb-profile-598f774585-wgv9r          1/1     Running       0             38s
+mongodb-rate-76c44597b9-bzlhd             1/1     Running       0             39s
+mongodb-recommendation-7c78b5c747-2q9cx   1/1     Running       0             38s
+mongodb-reservation-77b6f86b89-x7w7z      1/1     Running       0             38s
+mongodb-user-97596fd87-8v96q              1/1     Running       0             38s
+profile-644898ffcd-qtb29                  1/1     Running       0             39s
+rate-7cdc79d68f-hn9tt                     1/1     Running       0             39s
+recommendation-67d95776bb-d6ddt           1/1     Running       0             39s
+reservation-d6998c8bc-6hchq               1/1     Running       0             39s
+search-565b58db8-ht4xg                    1/1     Running       0             39s
+user-65448db4cb-kgq2d                     1/1     Running       0             39s
+user-7cddb8795d-cgwt2                     0/1     Terminating   2 (11s ago)   26s
+$ kubectl get endpoints -n hotel-reservation
+NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.221:5000    39s
+geo                      10.244.0.223:8083    39s
+mongodb-geo              10.244.0.227:27017   39s
+mongodb-profile          10.244.0.231:27017   39s
+mongodb-rate             10.244.0.228:27017   39s
+mongodb-recommendation   10.244.0.232:27017   39s
+mongodb-reservation      10.244.0.233:27017   39s
+mongodb-user             10.244.0.234:27017   39s
+profile                  10.244.0.225:8081    39s
+rate                     10.244.0.224:8084    39s
+recommendation           10.244.0.229:8085    39s
+reservation              10.244.0.226:8087    39s
+search                   10.244.0.222:8082    39s
+user                     10.244.0.230:8086    39s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+If every pod is 1/1 Running and every service has endpoints on the right port, call submit() again. Otherwise keep fixing.</pre></details></div><div class="step"><div class="sh"><b>#5</b> <span class="tier small">small</span> <code>submit(None)</code> </div><details><summary>reasoning &amp; output</summary><pre>Verified healthy.
+```
+submit()
+```</pre><pre class="obs">[evaluation] SUCCESS: cluster healthy</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · node_selector-detection · 3 steps · 2,412 tokens<span class="det">answered yes, expected yes</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-5v7nm                 1/1     Running   0          39s
+geo-5c966bd4b6-xffxf                      1/1     Running   0          39s
+mongodb-geo-869c7f74df-wrg2r              1/1     Running   0          38s
+mongodb-profile-598f774585-cfwt6          1/1     Running   0          38s
+mongodb-rate-76c44597b9-mljdq             1/1     Running   0          38s
+mongodb-recommendation-7c78b5c747-9mv7m   1/1     Running   0          37s
+mongodb-reservation-77b6f86b89-hsnzj      1/1     Running   0          37s
+mongodb-user-97596fd87-7rfww              1/1     Running   0          37s
+profile-644898ffcd-87qmd                  1/1     Running   0          39s
+rate-7cdc79d68f-g4f7b                     1/1     Running   0          39s
+recommendation-67d95776bb-qrqhb           1/1     Running   0          39s
+reservation-7f45f5b649-25hk2              0/1     Pending   0          25s
+reservation-d6998c8bc-4tgr5               1/1     Running   0          39s
+search-565b58db8-nnq7v                    1/1     Running   0          39s
+user-65448db4cb-sc2k4                     1/1     Running   0          38s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.149:5000    39s
+geo                      10.244.0.151:8083    39s
+mongodb-geo              10.244.0.157:27017   39s
+mongodb-profile          10.244.0.159:27017   39s
+mongodb-rate             10.244.0.158:27017   39s
+mongodb-recommendation   10.244.0.161:27017   39s
+mongodb-reservation      10.244.0.162:27017   39s
+mongodb-user             10.244.0.160:27017   39s
+profile                  10.244.0.153:8081    39s
+rate                     10.244.0.152:8084    39s
+recommendation           10.244.0.154:8085    39s
+reservation              10.244.0.155:8087    39s
+search                   10.244.0.150:8082    39s
+user                     10.244.0.156:8086    39s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>submit(&#x27;Yes&#x27;)</code> </div><details><summary>reasoning &amp; output</summary><pre>Decide.
+```
+submit(&quot;Yes&quot;)
+```</pre><pre class="obs">[evaluation] SUCCESS: answered yes, expected yes</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · node_selector-localization · 3 steps · 2,409 tokens<span class="det">top-1 &#x27;reservation&#x27;, expected &#x27;reservation&#x27; (submitted [&#x27;reservation&#x27;])</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-ggkqj                 1/1     Running   0          39s
+geo-5c966bd4b6-cz8vp                      1/1     Running   0          39s
+mongodb-geo-869c7f74df-72kcb              1/1     Running   0          39s
+mongodb-profile-598f774585-ngh7c          1/1     Running   0          38s
+mongodb-rate-76c44597b9-kcds6             1/1     Running   0          38s
+mongodb-recommendation-7c78b5c747-fgzx7   1/1     Running   0          38s
+mongodb-reservation-77b6f86b89-j9cp9      1/1     Running   0          38s
+mongodb-user-97596fd87-c7tz9              1/1     Running   0          38s
+profile-644898ffcd-pj679                  1/1     Running   0          39s
+rate-7cdc79d68f-h4fqx                     1/1     Running   0          39s
+recommendation-67d95776bb-rmksx           1/1     Running   0          39s
+reservation-7f45f5b649-5tqrw              0/1     Pending   0          26s
+reservation-d6998c8bc-n72z9               1/1     Running   0          39s
+search-565b58db8-r7g6h                    1/1     Running   0          39s
+user-65448db4cb-twld5                     1/1     Running   0          39s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.163:5000    39s
+geo                      10.244.0.165:8083    39s
+mongodb-geo              10.244.0.171:27017   39s
+mongodb-profile          10.244.0.173:27017   39s
+mongodb-rate             10.244.0.172:27017   39s
+mongodb-recommendation   10.244.0.174:27017   39s
+mongodb-reservation      10.244.0.175:27017   39s
+mongodb-user             10.244.0.176:27017   39s
+profile                  10.244.0.167:8081    39s
+rate                     10.244.0.166:8084    39s
+recommendation           10.244.0.168:8085    39s
+reservation              10.244.0.169:8087    39s
+search                   10.244.0.164:8082    39s
+user                     10.244.0.170:8086    39s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>submit([&#x27;reservation&#x27;])</code> </div><details><summary>reasoning &amp; output</summary><pre>Root cause identified.
+```
+submit([&quot;reservation&quot;])
+```</pre><pre class="obs">[evaluation] SUCCESS: top-1 &#x27;reservation&#x27;, expected &#x27;reservation&#x27; (submitted [&#x27;reservation&#x27;])</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · node_selector-mitigation · 5 steps · 5,407 tokens<span class="det">cluster healthy</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-bqpkj                 1/1     Running   0          39s
+geo-5c966bd4b6-h8tjz                      1/1     Running   0          39s
+mongodb-geo-869c7f74df-wpzlc              1/1     Running   0          39s
+mongodb-profile-598f774585-sqpzr          1/1     Running   0          38s
+mongodb-rate-76c44597b9-qx9qd             1/1     Running   0          38s
+mongodb-recommendation-7c78b5c747-b6pmf   1/1     Running   0          38s
+mongodb-reservation-77b6f86b89-26z67      1/1     Running   0          38s
+mongodb-user-97596fd87-dhc6r              1/1     Running   0          37s
+profile-644898ffcd-wv492                  1/1     Running   0          39s
+rate-7cdc79d68f-w5gcw                     1/1     Running   0          39s
+recommendation-67d95776bb-tblcq           1/1     Running   0          39s
+reservation-7f45f5b649-tpmsp              0/1     Pending   0          25s
+reservation-d6998c8bc-5nbwf               1/1     Running   0          39s
+search-565b58db8-wjvd8                    1/1     Running   0          39s
+user-65448db4cb-scqqk                     1/1     Running   0          39s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.177:5000    39s
+geo                      10.244.0.179:8083    39s
+mongodb-geo              10.244.0.185:27017   39s
+mongodb-profile          10.244.0.187:27017   39s
+mongodb-rate             10.244.0.186:27017   39s
+mongodb-recommendation   10.244.0.188:27017   39s
+mongodb-reservation      10.244.0.189:27017   39s
+mongodb-user             10.244.0.190:27017   39s
+profile                  10.244.0.181:8081    39s
+rate                     10.244.0.180:8084    39s
+recommendation           10.244.0.182:8085    39s
+reservation              10.244.0.183:8087    39s
+search                   10.244.0.178:8082    39s
+user                     10.244.0.184:8086    39s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>kubectl rollout undo deployment/reservation -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Apply the minimal fix.
+```
+exec_shell(&quot;kubectl rollout undo deployment/reservation -n hotel-reservation&quot;)
+```</pre><pre class="obs">deployment.apps/reservation rolled back</pre></details></div><div class="step"><div class="sh"><b>#4</b> <span class="tier small">small</span> <code>submit(None)</code> </div><details><summary>reasoning &amp; output</summary><pre>Done; submit (harness verifies first).
+```
+submit()
+```</pre><pre class="obs">Pre-submit verification (OpsPilot runs this automatically before closing a mitigation):
+$ kubectl get pods -n hotel-reservation
+NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-bqpkj                 1/1     Running   0          39s
+geo-5c966bd4b6-h8tjz                      1/1     Running   0          39s
+mongodb-geo-869c7f74df-wpzlc              1/1     Running   0          39s
+mongodb-profile-598f774585-sqpzr          1/1     Running   0          38s
+mongodb-rate-76c44597b9-qx9qd             1/1     Running   0          38s
+mongodb-recommendation-7c78b5c747-b6pmf   1/1     Running   0          38s
+mongodb-reservation-77b6f86b89-26z67      1/1     Running   0          38s
+mongodb-user-97596fd87-dhc6r              1/1     Running   0          37s
+profile-644898ffcd-wv492                  1/1     Running   0          39s
+rate-7cdc79d68f-w5gcw                     1/1     Running   0          39s
+recommendation-67d95776bb-tblcq           1/1     Running   0          39s
+reservation-d6998c8bc-5nbwf               1/1     Running   0          39s
+search-565b58db8-wjvd8                    1/1     Running   0          39s
+user-65448db4cb-scqqk                     1/1     Running   0          39s
+$ kubectl get endpoints -n hotel-reservation
+NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.177:5000    39s
+geo                      10.244.0.179:8083    39s
+mongodb-geo              10.244.0.185:27017   39s
+mongodb-profile          10.244.0.187:27017   39s
+mongodb-rate             10.244.0.186:27017   39s
+mongodb-recommendation   10.244.0.188:27017   39s
+mongodb-reservation      10.244.0.189:27017   39s
+mongodb-user             10.244.0.190:27017   39s
+profile                  10.244.0.181:8081    39s
+rate                     10.244.0.180:8084    39s
+recommendation           10.244.0.182:8085    39s
+reservation              10.244.0.183:8087    39s
+search                   10.244.0.178:8082    39s
+user                     10.244.0.184:8086    39s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+If every pod is 1/1 Running and every service has endpoints on the right port, call submit() again. Otherwise keep fixing.</pre></details></div><div class="step"><div class="sh"><b>#5</b> <span class="tier small">small</span> <code>submit(None)</code> </div><details><summary>reasoning &amp; output</summary><pre>Verified healthy.
+```
+submit()
+```</pre><pre class="obs">[evaluation] SUCCESS: cluster healthy</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · scale_zero-detection · 3 steps · 2,333 tokens<span class="det">answered yes, expected yes</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-dk4w6                 1/1     Running   0          39s
+geo-5c966bd4b6-t2xxs                      1/1     Running   0          39s
+mongodb-geo-869c7f74df-bmsq6              1/1     Running   0          38s
+mongodb-profile-598f774585-xnfs4          1/1     Running   0          38s
+mongodb-rate-76c44597b9-cl8mp             1/1     Running   0          38s
+mongodb-recommendation-7c78b5c747-827pk   1/1     Running   0          38s
+mongodb-reservation-77b6f86b89-v8x98      1/1     Running   0          38s
+mongodb-user-97596fd87-ntrxx              1/1     Running   0          37s
+rate-7cdc79d68f-smnv8                     1/1     Running   0          39s
+recommendation-67d95776bb-6fzcw           1/1     Running   0          39s
+reservation-d6998c8bc-9wfmn               1/1     Running   0          39s
+search-565b58db8-sxdvc                    1/1     Running   0          39s
+user-65448db4cb-prdp5                     1/1     Running   0          39s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS           AGE
+frontend                 10.244.0.19:5000    39s
+geo                      10.244.0.21:8083    39s
+mongodb-geo              10.244.0.27:27017   39s
+mongodb-profile          10.244.0.28:27017   39s
+mongodb-rate             10.244.0.29:27017   39s
+mongodb-recommendation   10.244.0.30:27017   38s
+mongodb-reservation      10.244.0.31:27017   38s
+mongodb-user             10.244.0.32:27017   38s
+profile                  &lt;none&gt;              39s
+rate                     10.244.0.22:8084    39s
+recommendation           10.244.0.24:8085    39s
+reservation              10.244.0.25:8087    39s
+search                   10.244.0.20:8082    39s
+user                     10.244.0.26:8086    39s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>submit(&#x27;Yes&#x27;)</code> </div><details><summary>reasoning &amp; output</summary><pre>Decide.
+```
+submit(&quot;Yes&quot;)
+```</pre><pre class="obs">[evaluation] SUCCESS: answered yes, expected yes</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · scale_zero-localization · 3 steps · 2,329 tokens<span class="det">top-1 &#x27;profile&#x27;, expected &#x27;profile&#x27; (submitted [&#x27;profile&#x27;])</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-rchbl                 1/1     Running   0          40s
+geo-5c966bd4b6-pwrv4                      1/1     Running   0          40s
+mongodb-geo-869c7f74df-kldks              1/1     Running   0          39s
+mongodb-profile-598f774585-qsvhb          1/1     Running   0          38s
+mongodb-rate-76c44597b9-gxlnl             1/1     Running   0          39s
+mongodb-recommendation-7c78b5c747-vjs6b   1/1     Running   0          38s
+mongodb-reservation-77b6f86b89-769dp      1/1     Running   0          38s
+mongodb-user-97596fd87-t4sxx              1/1     Running   0          38s
+rate-7cdc79d68f-c45xm                     1/1     Running   0          40s
+recommendation-67d95776bb-c255l           1/1     Running   0          39s
+reservation-d6998c8bc-wmpjv               1/1     Running   0          39s
+search-565b58db8-gqkfl                    1/1     Running   0          40s
+user-65448db4cb-r4z8z                     1/1     Running   0          39s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS           AGE
+frontend                 10.244.0.33:5000    40s
+geo                      10.244.0.35:8083    40s
+mongodb-geo              10.244.0.41:27017   39s
+mongodb-profile          10.244.0.44:27017   39s
+mongodb-rate             10.244.0.42:27017   39s
+mongodb-recommendation   10.244.0.43:27017   39s
+mongodb-reservation      10.244.0.45:27017   39s
+mongodb-user             10.244.0.46:27017   39s
+profile                  &lt;none&gt;              39s
+rate                     10.244.0.36:8084    40s
+recommendation           10.244.0.38:8085    39s
+reservation              10.244.0.39:8087    39s
+search                   10.244.0.34:8082    40s
+user                     10.244.0.40:8086    39s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>submit([&#x27;profile&#x27;])</code> </div><details><summary>reasoning &amp; output</summary><pre>Root cause identified.
+```
+submit([&quot;profile&quot;])
+```</pre><pre class="obs">[evaluation] SUCCESS: top-1 &#x27;profile&#x27;, expected &#x27;profile&#x27; (submitted [&#x27;profile&#x27;])</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · scale_zero-mitigation · 5 steps · 5,275 tokens<span class="det">cluster healthy</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-chbzp                 1/1     Running   0          40s
+geo-5c966bd4b6-njd27                      1/1     Running   0          40s
+mongodb-geo-869c7f74df-fjsdp              1/1     Running   0          39s
+mongodb-profile-598f774585-2zg4s          1/1     Running   0          39s
+mongodb-rate-76c44597b9-6q79k             1/1     Running   0          39s
+mongodb-recommendation-7c78b5c747-57pr9   1/1     Running   0          39s
+mongodb-reservation-77b6f86b89-5jp97      1/1     Running   0          38s
+mongodb-user-97596fd87-l6xbv              1/1     Running   0          38s
+rate-7cdc79d68f-5f6kg                     1/1     Running   0          40s
+recommendation-67d95776bb-gljb8           1/1     Running   0          39s
+reservation-d6998c8bc-g8bw5               1/1     Running   0          39s
+search-565b58db8-dvcs9                    1/1     Running   0          40s
+user-65448db4cb-8blsc                     1/1     Running   0          39s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS           AGE
+frontend                 10.244.0.47:5000    40s
+geo                      10.244.0.49:8083    40s
+mongodb-geo              10.244.0.55:27017   39s
+mongodb-profile          10.244.0.57:27017   39s
+mongodb-rate             10.244.0.56:27017   39s
+mongodb-recommendation   10.244.0.58:27017   39s
+mongodb-reservation      10.244.0.59:27017   39s
+mongodb-user             10.244.0.60:27017   39s
+profile                  &lt;none&gt;              39s
+rate                     10.244.0.50:8084    39s
+recommendation           10.244.0.52:8085    39s
+reservation              10.244.0.53:8087    39s
+search                   10.244.0.48:8082    40s
+user                     10.244.0.54:8086    39s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>kubectl scale deployment profile --replicas=1 -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Apply the minimal fix.
+```
+exec_shell(&quot;kubectl scale deployment profile --replicas=1 -n hotel-reservation&quot;)
+```</pre><pre class="obs">deployment.apps/profile scaled</pre></details></div><div class="step"><div class="sh"><b>#4</b> <span class="tier small">small</span> <code>submit(None)</code> </div><details><summary>reasoning &amp; output</summary><pre>Done; submit (harness verifies first).
+```
+submit()
+```</pre><pre class="obs">Pre-submit verification (OpsPilot runs this automatically before closing a mitigation):
+$ kubectl get pods -n hotel-reservation
+NAME                                      READY   STATUS              RESTARTS   AGE
+frontend-7955ddff9d-chbzp                 1/1     Running             0          40s
+geo-5c966bd4b6-njd27                      1/1     Running             0          40s
+mongodb-geo-869c7f74df-fjsdp              1/1     Running             0          39s
+mongodb-profile-598f774585-2zg4s          1/1     Running             0          39s
+mongodb-rate-76c44597b9-6q79k             1/1     Running             0          39s
+mongodb-recommendation-7c78b5c747-57pr9   1/1     Running             0          39s
+mongodb-reservation-77b6f86b89-5jp97      1/1     Running             0          38s
+mongodb-user-97596fd87-l6xbv              1/1     Running             0          38s
+profile-644898ffcd-45p8h                  0/1     ContainerCreating   0          0s
+rate-7cdc79d68f-5f6kg                     1/1     Running             0          40s
+recommendation-67d95776bb-gljb8           1/1     Running             0          39s
+reservation-d6998c8bc-g8bw5               1/1     Running             0          39s
+search-565b58db8-dvcs9                    1/1     Running             0          40s
+user-65448db4cb-8blsc                     1/1     Running             0          39s
+$ kubectl get endpoints -n hotel-reservation
+NAME                     ENDPOINTS           AGE
+frontend                 10.244.0.47:5000    40s
+geo                      10.244.0.49:8083    40s
+mongodb-geo              10.244.0.55:27017   39s
+mongodb-profile          10.244.0.57:27017   39s
+mongodb-rate             10.244.0.56:27017   39s
+mongodb-recommendation   10.244.0.58:27017   39s
+mongodb-reservation      10.244.0.59:27017   39s
+mongodb-user             10.244.0.60:27017   39s
+profile                  &lt;none&gt;              39s
+rate                     10.244.0.50:8084    39s
+recommendation           10.244.0.52:8085    39s
+reservation              10.244.0.53:8087    39s
+search                   10.244.0.48:8082    40s
+user                     10.244.0.54:8086    39s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+If every pod is 1/1 Running and every service has endpoints on the right port, call submit() again. Otherwise keep fixing.</pre></details></div><div class="step"><div class="sh"><b>#5</b> <span class="tier small">small</span> <code>submit(None)</code> </div><details><summary>reasoning &amp; output</summary><pre>Verified healthy.
+```
+submit()
+```</pre><pre class="obs">[evaluation] SUCCESS: cluster healthy</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · target_port-detection · 3 steps · 2,370 tokens<span class="det">answered yes, expected yes</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-qj6km                 1/1     Running   0          40s
+geo-5c966bd4b6-cg9ct                      1/1     Running   0          40s
+mongodb-geo-869c7f74df-9kf5z              1/1     Running   0          39s
+mongodb-profile-598f774585-kj5b2          1/1     Running   0          39s
+mongodb-rate-76c44597b9-m62ct             1/1     Running   0          39s
+mongodb-recommendation-7c78b5c747-n6h6x   1/1     Running   0          39s
+mongodb-reservation-77b6f86b89-fkhld      1/1     Running   0          38s
+mongodb-user-97596fd87-7rp7g              1/1     Running   0          38s
+profile-644898ffcd-v6hr9                  1/1     Running   0          39s
+rate-7cdc79d68f-954zs                     1/1     Running   0          40s
+recommendation-67d95776bb-spc8l           1/1     Running   0          39s
+reservation-d6998c8bc-6dmzm               1/1     Running   0          39s
+search-565b58db8-xc2xz                    1/1     Running   0          40s
+user-65448db4cb-zl9pd                     1/1     Running   0          39s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS           AGE
+frontend                 10.244.0.62:5000    41s
+geo                      10.244.0.64:9999    41s
+mongodb-geo              10.244.0.70:27017   40s
+mongodb-profile          10.244.0.72:27017   40s
+mongodb-rate             10.244.0.71:27017   40s
+mongodb-recommendation   10.244.0.73:27017   40s
+mongodb-reservation      10.244.0.74:27017   40s
+mongodb-user             10.244.0.75:27017   40s
+profile                  10.244.0.66:8081    40s
+rate                     10.244.0.65:8084    41s
+recommendation           10.244.0.67:8085    40s
+reservation              10.244.0.68:8087    40s
+search                   10.244.0.63:8082    41s
+user                     10.244.0.69:8086    40s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>submit(&#x27;Yes&#x27;)</code> </div><details><summary>reasoning &amp; output</summary><pre>Decide.
+```
+submit(&quot;Yes&quot;)
+```</pre><pre class="obs">[evaluation] SUCCESS: answered yes, expected yes</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · target_port-localization · 3 steps · 2,365 tokens<span class="det">top-1 &#x27;geo&#x27;, expected &#x27;geo&#x27; (submitted [&#x27;geo&#x27;])</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-68rjx                 1/1     Running   0          38s
+geo-5c966bd4b6-drgg2                      1/1     Running   0          38s
+mongodb-geo-869c7f74df-z25sx              1/1     Running   0          38s
+mongodb-profile-598f774585-tl96w          1/1     Running   0          37s
+mongodb-rate-76c44597b9-hpxxc             1/1     Running   0          38s
+mongodb-recommendation-7c78b5c747-ls85q   1/1     Running   0          37s
+mongodb-reservation-77b6f86b89-z6crm      1/1     Running   0          37s
+mongodb-user-97596fd87-l7stf              1/1     Running   0          37s
+profile-644898ffcd-rwd4k                  1/1     Running   0          38s
+rate-7cdc79d68f-wtb6p                     1/1     Running   0          38s
+recommendation-67d95776bb-7l5vd           1/1     Running   0          38s
+reservation-d6998c8bc-77q8w               1/1     Running   0          38s
+search-565b58db8-bzfsn                    1/1     Running   0          38s
+user-65448db4cb-ndsf5                     1/1     Running   0          38s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS           AGE
+frontend                 10.244.0.76:5000    39s
+geo                      10.244.0.77:9999    39s
+mongodb-geo              10.244.0.84:27017   39s
+mongodb-profile          10.244.0.86:27017   39s
+mongodb-rate             10.244.0.85:27017   39s
+mongodb-recommendation   10.244.0.87:27017   39s
+mongodb-reservation      10.244.0.88:27017   39s
+mongodb-user             10.244.0.89:27017   39s
+profile                  10.244.0.79:8081    39s
+rate                     10.244.0.78:8084    39s
+recommendation           10.244.0.80:8085    39s
+reservation              10.244.0.81:8087    39s
+search                   10.244.0.82:8082    39s
+user                     10.244.0.83:8086    39s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>submit([&#x27;geo&#x27;])</code> </div><details><summary>reasoning &amp; output</summary><pre>Root cause identified.
+```
+submit([&quot;geo&quot;])
+```</pre><pre class="obs">[evaluation] SUCCESS: top-1 &#x27;geo&#x27;, expected &#x27;geo&#x27; (submitted [&#x27;geo&#x27;])</pre></details></div></details><details class="ep"><summary><span class="badge pass">PASS</span> <b>oracle</b> · target_port-mitigation · 5 steps · 5,357 tokens<span class="det">cluster healthy</span></summary><div class="step"><div class="sh"><b>#1</b> <span class="tier small">small</span> <code>kubectl get pods -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Start broad: check workload status.
+```
+exec_shell(&quot;kubectl get pods -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-8bxb4                 1/1     Running   0          38s
+geo-5c966bd4b6-pchhk                      1/1     Running   0          38s
+mongodb-geo-869c7f74df-9zb2l              1/1     Running   0          38s
+mongodb-profile-598f774585-qpwg4          1/1     Running   0          37s
+mongodb-rate-76c44597b9-lgcst             1/1     Running   0          37s
+mongodb-recommendation-7c78b5c747-qcxv9   1/1     Running   0          37s
+mongodb-reservation-77b6f86b89-b6jjn      1/1     Running   0          37s
+mongodb-user-97596fd87-mt7k5              1/1     Running   0          37s
+profile-644898ffcd-5gttw                  1/1     Running   0          38s
+rate-7cdc79d68f-7cbvq                     1/1     Running   0          38s
+recommendation-67d95776bb-5d2zv           1/1     Running   0          38s
+reservation-d6998c8bc-9zmqg               1/1     Running   0          38s
+search-565b58db8-dpcv2                    1/1     Running   0          38s
+user-65448db4cb-c9s77                     1/1     Running   0          38s</pre></details></div><div class="step"><div class="sh"><b>#2</b> <span class="tier small">small</span> <code>kubectl get endpoints -n hotel-reservation</code> </div><details><summary>reasoning &amp; output</summary><pre>Check that every service has endpoints.
+```
+exec_shell(&quot;kubectl get endpoints -n hotel-reservation&quot;)
+```</pre><pre class="obs">NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.90:5000     38s
+geo                      10.244.0.92:9999     38s
+mongodb-geo              10.244.0.97:27017    38s
+mongodb-profile          10.244.0.100:27017   38s
+mongodb-rate             10.244.0.99:27017    38s
+mongodb-recommendation   10.244.0.101:27017   38s
+mongodb-reservation      10.244.0.102:27017   38s
+mongodb-user             10.244.0.103:27017   38s
+profile                  10.244.0.94:8081     38s
+rate                     10.244.0.93:8084     38s
+recommendation           10.244.0.95:8085     38s
+reservation              10.244.0.98:8087     38s
+search                   10.244.0.91:8082     38s
+user                     10.244.0.96:8086     38s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice</pre></details></div><div class="step"><div class="sh"><b>#3</b> <span class="tier small">small</span> <code>kubectl patch service geo -n hotel-reservation -p &#x27;{&quot;spec&quot;:{&quot;ports&quot;:[{&quot;port&quot;:8083,&quot;targetPort&quot;:8083}]}}&#x27;</code> </div><details><summary>reasoning &amp; output</summary><pre>Apply the minimal fix.
+```
+exec_shell(&quot;kubectl patch service geo -n hotel-reservation -p &#x27;{\&quot;spec\&quot;:{\&quot;ports\&quot;:[{\&quot;port\&quot;:8083,\&quot;targetPort\&quot;:8083}]}}&#x27;&quot;)
+```</pre><pre class="obs">service/geo patched</pre></details></div><div class="step"><div class="sh"><b>#4</b> <span class="tier small">small</span> <code>submit(None)</code> </div><details><summary>reasoning &amp; output</summary><pre>Done; submit (harness verifies first).
+```
+submit()
+```</pre><pre class="obs">Pre-submit verification (OpsPilot runs this automatically before closing a mitigation):
+$ kubectl get pods -n hotel-reservation
+NAME                                      READY   STATUS    RESTARTS   AGE
+frontend-7955ddff9d-8bxb4                 1/1     Running   0          38s
+geo-5c966bd4b6-pchhk                      1/1     Running   0          38s
+mongodb-geo-869c7f74df-9zb2l              1/1     Running   0          38s
+mongodb-profile-598f774585-qpwg4          1/1     Running   0          37s
+mongodb-rate-76c44597b9-lgcst             1/1     Running   0          37s
+mongodb-recommendation-7c78b5c747-qcxv9   1/1     Running   0          37s
+mongodb-reservation-77b6f86b89-b6jjn      1/1     Running   0          37s
+mongodb-user-97596fd87-mt7k5              1/1     Running   0          37s
+profile-644898ffcd-5gttw                  1/1     Running   0          38s
+rate-7cdc79d68f-7cbvq                     1/1     Running   0          38s
+recommendation-67d95776bb-5d2zv           1/1     Running   0          38s
+reservation-d6998c8bc-9zmqg               1/1     Running   0          38s
+search-565b58db8-dpcv2                    1/1     Running   0          38s
+user-65448db4cb-c9s77                     1/1     Running   0          38s
+$ kubectl get endpoints -n hotel-reservation
+NAME                     ENDPOINTS            AGE
+frontend                 10.244.0.90:5000     38s
+geo                      10.244.0.92:8083     38s
+mongodb-geo              10.244.0.97:27017    38s
+mongodb-profile          10.244.0.100:27017   38s
+mongodb-rate             10.244.0.99:27017    38s
+mongodb-recommendation   10.244.0.101:27017   38s
+mongodb-reservation      10.244.0.102:27017   38s
+mongodb-user             10.244.0.103:27017   38s
+profile                  10.244.0.94:8081     38s
+rate                     10.244.0.93:8084     38s
+recommendation           10.244.0.95:8085     38s
+reservation              10.244.0.98:8087     38s
+search                   10.244.0.91:8082     38s
+user                     10.244.0.96:8086     38s
+Warning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice
+If every pod is 1/1 Running and every service has endpoints on the right port, call submit() again. Otherwise keep fixing.</pre></details></div><div class="step"><div class="sh"><b>#5</b> <span class="tier small">small</span> <code>submit(None)</code> </div><details><summary>reasoning &amp; output</summary><pre>Verified healthy.
+```
+submit()
+```</pre><pre class="obs">[evaluation] SUCCESS: cluster healthy</pre></details></div></details></div>
+</main></body></html>

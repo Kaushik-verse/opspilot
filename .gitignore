@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+results/adhoc/
+results/*/traces/*.tmp
+dist/
+.DS_Store

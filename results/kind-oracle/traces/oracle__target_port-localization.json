@@ -1,0 +1,65 @@
+{
+  "summary": {
+    "episode": "target_port-localization",
+    "scenario": "target_port",
+    "task": "localization",
+    "config": "oracle",
+    "success": true,
+    "answer": [
+      "geo"
+    ],
+    "detail": "top-1 'geo', expected 'geo' (submitted ['geo'])",
+    "steps": 3,
+    "small_tokens": 2365,
+    "large_tokens": 0,
+    "llm_calls": 3,
+    "escalated": false,
+    "escalation_reason": "",
+    "blocked_actions": 0,
+    "format_errors": 0,
+    "writes": 0,
+    "wall_s": 0.11264475000007224,
+    "llm_s": 0.0,
+    "error": "",
+    "total_tokens": 2365
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "small",
+      "model": "oracle",
+      "tokens": 505,
+      "latency_s": 0.0,
+      "response": "Start broad: check workload status.\n```\nexec_shell(\"kubectl get pods -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pods -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "NAME                                      READY   STATUS    RESTARTS   AGE\nfrontend-7955ddff9d-68rjx                 1/1     Running   0          38s\ngeo-5c966bd4b6-drgg2                      1/1     Running   0          38s\nmongodb-geo-869c7f74df-z25sx              1/1     Running   0          38s\nmongodb-profile-598f774585-tl96w          1/1     Running   0          37s\nmongodb-rate-76c44597b9-hpxxc             1/1     Running   0          38s\nmongodb-recommendation-7c78b5c747-ls85q   1/1     Running   0          37s\nmongodb-reservation-77b6f86b89-z6crm      1/1     Running   0          37s\nmongodb-user-97596fd87-l7stf              1/1     Running   0          37s\nprofile-644898ffcd-rwd4k                  1/1     Running   0          38s\nrate-7cdc79d68f-wtb6p                     1/1     Running   0          38s\nrecommendation-67d95776bb-7l5vd           1/1     Running   0          38s\nreservation-d6998c8bc-77q8w               1/1     Running   0          38s\nsearch-565b58db8-bzfsn                    1/1     Running   0          38s\nuser-65448db4cb-ndsf5                     1/1     Running   0          38s"
+    },
+    {
+      "step": 2,
+      "tier": "small",
+      "model": "oracle",
+      "tokens": 822,
+      "latency_s": 0.0,
+      "response": "Check that every service has endpoints.\n```\nexec_shell(\"kubectl get endpoints -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get endpoints -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "NAME                     ENDPOINTS           AGE\nfrontend                 10.244.0.76:5000    39s\ngeo                      10.244.0.77:9999    39s\nmongodb-geo              10.244.0.84:27017   39s\nmongodb-profile          10.244.0.86:27017   39s\nmongodb-rate             10.244.0.85:27017   39s\nmongodb-recommendation   10.244.0.87:27017   39s\nmongodb-reservation      10.244.0.88:27017   39s\nmongodb-user             10.244.0.89:27017   39s\nprofile                  10.244.0.79:8081    39s\nrate                     10.244.0.78:8084    39s\nrecommendation           10.244.0.80:8085    39s\nreservation              10.244.0.81:8087    39s\nsearch                   10.244.0.82:8082    39s\nuser                     10.244.0.83:8086    39s\nWarning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice"
+    },
+    {
+      "step": 3,
+      "tier": "small",
+      "model": "oracle",
+      "tokens": 1038,
+      "latency_s": 0.0,
+      "response": "Root cause identified.\n```\nsubmit([\"geo\"])\n```",
+      "action": "submit",
+      "answer": [
+        "geo"
+      ],
+      "observation": "[evaluation] SUCCESS: top-1 'geo', expected 'geo' (submitted ['geo'])"
+    }
+  ]
+}

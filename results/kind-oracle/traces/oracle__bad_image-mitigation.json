@@ -1,0 +1,84 @@
+{
+  "summary": {
+    "episode": "bad_image-mitigation",
+    "scenario": "bad_image",
+    "task": "mitigation",
+    "config": "oracle",
+    "success": true,
+    "answer": null,
+    "detail": "cluster healthy",
+    "steps": 5,
+    "small_tokens": 5577,
+    "large_tokens": 0,
+    "llm_calls": 5,
+    "escalated": false,
+    "escalation_reason": "",
+    "blocked_actions": 0,
+    "format_errors": 0,
+    "writes": 1,
+    "wall_s": 0.3805261249999603,
+    "llm_s": 0.0,
+    "error": "",
+    "total_tokens": 5577
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "small",
+      "model": "oracle",
+      "tokens": 547,
+      "latency_s": 0.0,
+      "response": "Start broad: check workload status.\n```\nexec_shell(\"kubectl get pods -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pods -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "NAME                                      READY   STATUS             RESTARTS   AGE\nfrontend-7955ddff9d-j48vg                 1/1     Running            0          39s\ngeo-5c966bd4b6-89bmz                      1/1     Running            0          39s\nmongodb-geo-869c7f74df-flvzj              1/1     Running            0          38s\nmongodb-profile-598f774585-l7gkm          1/1     Running            0          38s\nmongodb-rate-76c44597b9-v5gfp             1/1     Running            0          38s\nmongodb-recommendation-7c78b5c747-ffqp7   1/1     Running            0          37s\nmongodb-reservation-77b6f86b89-c58jv      1/1     Running            0          37s\nmongodb-user-97596fd87-zlcg8              1/1     Running            0          37s\nprofile-644898ffcd-xwd76                  1/1     Running            0          38s\nrate-7cdc79d68f-6hzmw                     1/1     Running            0          38s\nrate-95f444767-v9x62                      0/1     ImagePullBackOff   0          25s\nrecommendation-67d95776bb-kkp2n           1/1     Running            0          38s\nreservation-d6998c8bc-nczht               1/1     Running            0          38s\nsearch-565b58db8-dq8ps                    1/1     Running            0          39s\nuser-65448db4cb-6vsvt                     1/1     Running            0          38s"
+    },
+    {
+      "step": 2,
+      "tier": "small",
+      "model": "oracle",
+      "tokens": 920,
+      "latency_s": 0.0,
+      "response": "Check that every service has endpoints.\n```\nexec_shell(\"kubectl get endpoints -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get endpoints -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "NAME                     ENDPOINTS            AGE\nfrontend                 10.244.0.134:5000    39s\ngeo                      10.244.0.136:8083    38s\nmongodb-geo              10.244.0.142:27017   38s\nmongodb-profile          10.244.0.144:27017   38s\nmongodb-rate             10.244.0.143:27017   38s\nmongodb-recommendation   10.244.0.145:27017   38s\nmongodb-reservation      10.244.0.146:27017   38s\nmongodb-user             10.244.0.147:27017   38s\nprofile                  10.244.0.138:8081    38s\nrate                     10.244.0.137:8084    38s\nrecommendation           10.244.0.139:8085    38s\nreservation              10.244.0.140:8087    38s\nsearch                   10.244.0.135:8082    39s\nuser                     10.244.0.141:8086    38s\nWarning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice"
+    },
+    {
+      "step": 3,
+      "tier": "small",
+      "model": "oracle",
+      "tokens": 1153,
+      "latency_s": 0.0,
+      "response": "Apply the minimal fix.\n```\nexec_shell(\"kubectl rollout undo deployment/rate -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl rollout undo deployment/rate -n hotel-reservation",
+      "guardrail": "write",
+      "observation": "deployment.apps/rate rolled back"
+    },
+    {
+      "step": 4,
+      "tier": "small",
+      "model": "oracle",
+      "tokens": 1175,
+      "latency_s": 0.0,
+      "response": "Done; submit (harness verifies first).\n```\nsubmit()\n```",
+      "action": "submit",
+      "answer": null,
+      "observation": "Pre-submit verification (OpsPilot runs this automatically before closing a mitigation):\n$ kubectl get pods -n hotel-reservation\nNAME                                      READY   STATUS        RESTARTS   AGE\nfrontend-7955ddff9d-j48vg                 1/1     Running       0          39s\ngeo-5c966bd4b6-89bmz                      1/1     Running       0          39s\nmongodb-geo-869c7f74df-flvzj              1/1     Running       0          38s\nmongodb-profile-598f774585-l7gkm          1/1     Running       0          38s\nmongodb-rate-76c44597b9-v5gfp             1/1     Running       0          38s\nmongodb-recommendation-7c78b5c747-ffqp7   1/1     Running       0          37s\nmongodb-reservation-77b6f86b89-c58jv      1/1     Running       0          37s\nmongodb-user-97596fd87-zlcg8              1/1     Running       0          37s\nprofile-644898ffcd-xwd76                  1/1     Running       0          38s\nrate-7cdc79d68f-6hzmw                     1/1     Running       0          38s\nrate-95f444767-v9x62                      0/1     Terminating   0          25s\nrecommendation-67d95776bb-kkp2n           1/1     Running       0          38s\nreservation-d6998c8bc-nczht               1/1     Running       0          38s\nsearch-565b58db8-dq8ps                    1/1     Running       0          39s\nuser-65448db4cb-6vsvt                     1/1     Running       0          38s\n$ kubectl get endpoints -n hotel-reservation\nNAME                     ENDPOINTS            AGE\nfrontend                 10.244.0.134:5000    39s\ngeo                      10.244.0.136:8083    38s\nmongodb-geo              10.244.0.142:27017   38s\nmongodb-profile          10.244.0.144:27017   38s\nmongodb-rate             10.244.0.143:27017   38s\nmongodb-recommendation   10.244.0.145:27017   38s\nmongodb-reservation      10.244.0.146:27017   38s\nmongodb-user             10.244.0.147:27017   38s\nprofile                  10.244.0.138:8081    38s\nrate                     10.244.0.137:8084    38s\nrecommendation           10.244.0.139:8085    38s\nreservation              10.244.0.140:8087    38s\nsearch                   10.244.0.135:8082    39s\nuser                     10.244.0.141:8086    38s\nWarning: v1 Endpoints is deprecated in v1.33+; use discovery.k8s.io/v1 EndpointSlice\nIf every pod is 1/1 Running and every service has endpoints on the right port, call submit() again. Otherwise keep fixing."
+    },
+    {
+      "step": 5,
+      "tier": "small",
+      "model": "oracle",
+      "tokens": 1782,
+      "latency_s": 0.0,
+      "response": "Verified healthy.\n```\nsubmit()\n```",
+      "action": "submit",
+      "answer": null,
+      "observation": "[evaluation] SUCCESS: cluster healthy"
+    }
+  ]
+}

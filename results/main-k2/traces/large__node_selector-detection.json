@@ -1,0 +1,109 @@
+{
+  "summary": {
+    "episode": "node_selector-detection",
+    "scenario": "node_selector",
+    "task": "detection",
+    "config": "large",
+    "success": true,
+    "answer": "Yes",
+    "detail": "answered yes, expected yes",
+    "steps": 7,
+    "small_tokens": 0,
+    "large_tokens": 9534,
+    "llm_calls": 7,
+    "escalated": false,
+    "escalation_reason": "",
+    "blocked_actions": 0,
+    "format_errors": 0,
+    "writes": 0,
+    "wall_s": 52.078768041999865,
+    "llm_s": 7.2064600810008415,
+    "error": "",
+    "total_tokens": 9534
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1115,
+      "latency_s": 1.76,
+      "response": "``` \nexec_shell(\"kubectl get deployments -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get deployments -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "NAME                     READY   UP-TO-DATE   AVAILABLE   AGE\nfrontend                 1/1     1            1           42m\nsearch                   1/1     1            1           42m\ngeo                      1/1     1            1           42m\nrate                     1/1     1            1           42m\nprofile                  1/1     1            1           42m\nrecommendation           1/1     1            1           42m\nreservation              0/1     1            0           42m\nuser                     1/1     1            1           42m\nmongodb-geo              1/1     1            1           42m\nmongodb-rate             1/1     1            1           42m\nmongodb-profile          1/1     1            1           42m\nmongodb-recommendation   1/1     1            1           42m\nmongodb-reservation      1/1     1            1           42m\nmongodb-user             1/1     1            1           42m"
+    },
+    {
+      "step": 2,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1498,
+      "latency_s": 1.8,
+      "response": "``` \nsubmit(\"Yes\")\n```",
+      "action": "submit",
+      "answer": "Yes",
+      "observation": "Self-check before your answer is recorded: you have not yet checked service endpoints (kubectl get endpoints); application logs (kubectl logs). Check them now, then submit again (the same answer if it still holds, or a corrected one)."
+    },
+    {
+      "step": 3,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1220,
+      "latency_s": 0.91,
+      "response": "``` \nexec_shell(\"kubectl get endpoints -n hotel-reservation\")\n`````` \nexec_shell(\"kubectl get endpoints -n hotel-reservation\")\n`````` \nexec_shell(\"kubectl get endpoints -n hotel-reservation\")\n`````` \nexec_shell(\"kubectl logs -n hotel-reservation -l app=reservation --tail=20\")\n`````` \nsubmit(\"Yes\")\n```",
+      "action": "exec_shell",
+      "warning": "5 code blocks; only the first was executed",
+      "command": "kubectl get endpoints -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "NAME                     ENDPOINTS            AGE\nfrontend                 10.244.1.147:5000    42m\nsearch                   10.244.2.165:8082    42m\ngeo                      10.244.1.138:8083    42m\nrate                     10.244.1.224:8084    42m\nprofile                  10.244.1.165:8081    42m\nrecommendation           10.244.1.106:8085    42m\nreservation              <none>               42m\nuser                     10.244.2.49:8086     42m\nmongodb-geo              10.244.1.64:27017    42m\nmongodb-rate             10.244.2.132:27017   42m\nmongodb-profile          10.244.1.82:27017    42m\nmongodb-recommendation   10.244.1.27:27017    42m\nmongodb-reservation      10.244.1.151:27017   42m\nmongodb-user             10.244.2.59:27017    42m"
+    },
+    {
+      "step": 4,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1328,
+      "latency_s": 0.62,
+      "response": "``` \nexec_shell(\"kubectl logs -n hotel-reservation -l app=reservation --tail=50\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl logs -n hotel-reservation -l app=reservation --tail=50",
+      "guardrail": "read",
+      "observation": "error: expected 'logs [-f] [-p] (POD | TYPE/NAME) [-c CONTAINER]'."
+    },
+    {
+      "step": 5,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1420,
+      "latency_s": 0.8,
+      "response": "``` \nexec_shell(\"kubectl get pods -n hotel-reservation -l app=reservation -o name\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pods -n hotel-reservation -l app=reservation -o name",
+      "guardrail": "read",
+      "observation": "pod/reservation-f0e70c40b-0e6f0"
+    },
+    {
+      "step": 6,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1445,
+      "latency_s": 0.5,
+      "response": "``` \nexec_shell(\"kubectl logs -n hotel-reservation reservation-f0e70c40b-0e6f0 --tail=100\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl logs -n hotel-reservation reservation-f0e70c40b-0e6f0 --tail=100",
+      "guardrail": "read",
+      "observation": "Error from server (BadRequest): container \"reservation\" in pod \"reservation-f0e70c40b-0e6f0\" is waiting to start: ContainerCreating"
+    },
+    {
+      "step": 7,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1508,
+      "latency_s": 0.81,
+      "response": "``` \nsubmit(\"Yes\")\n```",
+      "action": "submit",
+      "answer": "Yes",
+      "observation": "[evaluation] SUCCESS: answered yes, expected yes"
+    }
+  ]
+}

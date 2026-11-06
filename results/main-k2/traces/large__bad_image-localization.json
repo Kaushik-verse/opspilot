@@ -1,0 +1,105 @@
+{
+  "summary": {
+    "episode": "bad_image-localization",
+    "scenario": "bad_image",
+    "task": "localization",
+    "config": "large",
+    "success": true,
+    "answer": [
+      "rate"
+    ],
+    "detail": "top-1 'rate', expected 'rate' (submitted ['rate'])",
+    "steps": 6,
+    "small_tokens": 0,
+    "large_tokens": 9814,
+    "llm_calls": 6,
+    "escalated": false,
+    "escalation_reason": "",
+    "blocked_actions": 0,
+    "format_errors": 0,
+    "writes": 0,
+    "wall_s": 62.58098779099964,
+    "llm_s": 3.4418519169976207,
+    "error": "",
+    "total_tokens": 9814
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1115,
+      "latency_s": 0.55,
+      "response": "``` \nexec_shell(\"kubectl get pods -n hotel-reservation -o wide\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pods -n hotel-reservation -o wide",
+      "guardrail": "read",
+      "observation": "NAME                                     READY   STATUS             RESTARTS   AGE   IP             NODE           NOMINATED NODE   READINESS GATES\nfrontend-4dc6abb6e-fd83b                 1/1     Running            0          42m   10.244.1.147   kind-worker2   <none>           <none>\nsearch-c179abadc-6cfc4                   1/1     Running            0          42m   10.244.2.165   kind-worker2   <none>           <none>\ngeo-f4b9f2896-d3b50                      1/1     Running            0          42m   10.244.1.138   kind-worker    <none>           <none>\nrate-096cf7c26-bd3ff                     0/1     ImagePullBackOff   0          15s   10.244.1.28    kind-worker    <none>           <none>\nprofile-d2ab717b5-8748a                  1/1     Running            0          42m   10.244.1.165   kind-worker2   <none>           <none>\nrecommendation-c829feafe-40309           1/1     Running            0          42m   10.244.1.106   kind-worker2   <none>           <none>\nreservation-657541b01-4bee0              1/1     Running            0          42m   10.244.1.118   kind-worker    <none>           <none>\nuser-47b43b1dc-6848d                     1/1     Running            0          42m   10.244.2.49    kind-worker2   <none>           <none>\nmongodb-geo-bfc840abb-c98db              1/1     Running            0          42m   10.244.1.64    kind-worker2   <none>           <none>\nmongodb-rate-230f5c1f9-1ec6c             1/1     Running            0          42m   10.244.2.132   kind-worker    <none>           <none>\nmongodb-profile-e174becf9-60a15          1/1     Running            0          42m   10.244.1.82    kind-worker2   <none>           <none>\nmongodb-recommendation-a35e4dea7-d2d46   1/1     Running            0          42m   10.244.1.27    kind-worker    <none>           <none>\nmongodb-reservation-a7f1d70d8-af973      1/1     Running            0          42m   10.244.1.151   kind-worker    <none>           <none>\nmongodb-user-eff0da4a6-42cdc             1/1     Running            0          42m   10.244.2.59    kind-worker    <none>           <none>"
+    },
+    {
+      "step": 2,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1307,
+      "latency_s": 0.58,
+      "response": "``` \nexec_shell(\"kubectl describe deployment rate -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl describe deployment rate -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "Name:                   rate\nNamespace:              hotel-reservation\nLabels:                 app=rate\nAnnotations:            deployment.kubernetes.io/revision: 2\nSelector:               app=rate\nReplicas:               1 desired | 1 updated | 1 total | 0 available | 1 unavailable\nStrategyType:           RollingUpdate\nPod Template:\n  Labels:  app=rate\n  Containers:\n   rate:\n    Image:      opspilot/hotel-rate:1.5.0-rc3\n    Port:       8084/TCP\n    Environment:\n      SERVICE_PORT:  8084\n      LOG_LEVEL:  info\n      DB_URL:  mongodb://mongodb-rate:27017/rate\n  Node-Selectors:  <none>\nConditions:\n  Type           Status  Reason\n  Available      False   MinimumReplicasUnavailable"
+    },
+    {
+      "step": 3,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1657,
+      "latency_s": 0.73,
+      "response": "``` \nexec_shell(\"kubectl describe pod rate-096cf7c26-bd3ff -n hotel-reservation\")\n`````` \nexec_shell(\"kubectl get deployment rate -n hotel-reservation -o yaml\")\n```submit([\"rate\"])",
+      "action": "exec_shell",
+      "warning": "2 code blocks; only the first was executed",
+      "command": "kubectl describe pod rate-096cf7c26-bd3ff -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "Name:             rate-096cf7c26-bd3ff\nNamespace:        hotel-reservation\nNode:             kind-worker/172.18.0.3\nLabels:           app=rate, tier=app\nStatus:           Pending\nIP:               10.244.1.28\nContainers:\n  rate:\n    Image:          opspilot/hotel-rate:1.5.0-rc3\n    Port:           8084/TCP\n    State:          Waiting\n      Reason:       ImagePullBackOff\n    Ready:          False\n    Restart Count:  0\n    Environment:\n      SERVICE_PORT:  8084\n      LOG_LEVEL:  info\n      DB_URL:  mongodb://mongodb-rate:27017/rate\nConditions:\n  Type              Status\n  PodScheduled      True\n  Ready             False\nNode-Selectors:   <none>\nEvents:\n  Type     Reason            Age   From               Message\n  ----     ------            ----  ----               -------\n  Warning  Failed            38s   kubelet            Failed to pull image \"opspilot/hotel-rate:1.5.0-rc3\": rpc error: code = NotFound desc = failed to pull and unpack image \"docker.io/opspilot/hotel-rate:1.5.0-rc3\": not found"
+    },
+    {
+      "step": 4,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1826,
+      "latency_s": 0.43,
+      "response": "submit([\"rate\"])",
+      "action": "submit",
+      "warning": "action written without a code block",
+      "answer": [
+        "rate"
+      ],
+      "observation": "Self-check before your answer is recorded: you have not yet checked service endpoints (kubectl get endpoints); application logs (kubectl logs). Check them now, then submit again (the same answer if it still holds, or a corrected one)."
+    },
+    {
+      "step": 5,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1937,
+      "latency_s": 0.78,
+      "response": "``` \nexec_shell(\"kubectl logs rate-096cf7c26-bd3ff -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl logs rate-096cf7c26-bd3ff -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "Error from server (BadRequest): container \"rate\" in pod \"rate-096cf7c26-bd3ff\" is waiting to start: trying and failing to pull image"
+    },
+    {
+      "step": 6,
+      "tier": "large",
+      "model": "openai/gpt-oss-120b",
+      "tokens": 1972,
+      "latency_s": 0.36,
+      "response": "submit([\"rate\"])",
+      "action": "submit",
+      "warning": "action written without a code block",
+      "answer": [
+        "rate"
+      ],
+      "observation": "[evaluation] SUCCESS: top-1 'rate', expected 'rate' (submitted ['rate'])"
+    }
+  ]
+}

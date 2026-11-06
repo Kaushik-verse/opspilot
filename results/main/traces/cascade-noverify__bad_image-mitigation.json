@@ -1,0 +1,110 @@
+{
+  "summary": {
+    "episode": "bad_image-mitigation",
+    "scenario": "bad_image",
+    "task": "mitigation",
+    "config": "cascade-noverify",
+    "success": true,
+    "answer": null,
+    "detail": "cluster healthy",
+    "steps": 7,
+    "small_tokens": 7296,
+    "large_tokens": 0,
+    "llm_calls": 7,
+    "escalated": false,
+    "escalation_reason": "",
+    "blocked_actions": 0,
+    "format_errors": 0,
+    "writes": 1,
+    "wall_s": 46.0001305830001,
+    "llm_s": 7.325403792000543,
+    "error": "",
+    "total_tokens": 7296
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 601,
+      "latency_s": 0.83,
+      "response": "```\nexec_shell(\"kubectl get deployments -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get deployments -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "NAME                     READY   UP-TO-DATE   AVAILABLE   AGE\nfrontend                 1/1     1            1           42m\nsearch                   1/1     1            1           42m\ngeo                      1/1     1            1           42m\nrate                     0/1     1            0           42m\nprofile                  1/1     1            1           42m\nrecommendation           1/1     1            1           42m\nreservation              1/1     1            1           42m\nuser                     1/1     1            1           42m\nmongodb-geo              1/1     1            1           42m\nmongodb-rate             1/1     1            1           42m\nmongodb-profile          1/1     1            1           42m\nmongodb-recommendation   1/1     1            1           42m\nmongodb-reservation      1/1     1            1           42m\nmongodb-user             1/1     1            1           42m"
+    },
+    {
+      "step": 2,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 863,
+      "latency_s": 0.49,
+      "response": "```\nexec_shell(\"kubectl logs -n hotel-reservation -l app=rate --tail=20\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl logs -n hotel-reservation -l app=rate --tail=20",
+      "guardrail": "read",
+      "observation": "error: expected 'logs [-f] [-p] (POD | TYPE/NAME) [-c CONTAINER]'."
+    },
+    {
+      "step": 3,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 899,
+      "latency_s": 2.22,
+      "response": "```\nexec_shell(\"kubectl get pods -n hotel-reservation -l app=rate -o name\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pods -n hotel-reservation -l app=rate -o name",
+      "guardrail": "read",
+      "observation": "pod/rate-096cf7c26-bd3ff"
+    },
+    {
+      "step": 4,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1180,
+      "latency_s": 1.34,
+      "response": "```\nexec_shell(\"kubectl logs -n hotel-reservation pod/rate-096cf7c26-bd3ff\")\n``````\nexec_shell(\"kubectl logs -n hotel-reservation pod/rate-096cf7c26-bd3ff | head -n 20\")\n``````\nexec_shell(\"kubectl logs -n hotel-reservation pod/rate-096cf7c26-bd3ff | grep -i error | head -n 20\")\n``````\nexec_shell(\"kubectl describe deployment rate -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "warning": "4 code blocks; only the first was executed",
+      "command": "kubectl logs -n hotel-reservation pod/rate-096cf7c26-bd3ff",
+      "guardrail": "read",
+      "observation": "Error from server (BadRequest): container \"rate\" in pod \"rate-096cf7c26-bd3ff\" is waiting to start: trying and failing to pull image"
+    },
+    {
+      "step": 5,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1203,
+      "latency_s": 0.4,
+      "response": "```\nexec_shell(\"kubectl get deployment rate -n hotel-reservation -o yaml | grep image:\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get deployment rate -n hotel-reservation -o yaml | grep image:",
+      "guardrail": "read",
+      "observation": "        image: opspilot/hotel-rate:1.5.0-rc3"
+    },
+    {
+      "step": 6,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1261,
+      "latency_s": 1.47,
+      "response": "```\nexec_shell(\"kubectl rollout undo deployment/rate -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl rollout undo deployment/rate -n hotel-reservation",
+      "guardrail": "write",
+      "observation": "deployment.apps/rate rolled back"
+    },
+    {
+      "step": 7,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1289,
+      "latency_s": 0.58,
+      "response": "```\nsubmit()\n```\n",
+      "action": "submit",
+      "answer": null,
+      "observation": "[evaluation] SUCCESS: cluster healthy"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "summary": {
+    "episode": "scale_zero-localization",
+    "scenario": "scale_zero",
+    "task": "localization",
+    "config": "cascade-noverify",
+    "success": true,
+    "answer": [
+      "profile"
+    ],
+    "detail": "top-1 'profile', expected 'profile' (submitted ['profile'])",
+    "steps": 6,
+    "small_tokens": 7700,
+    "large_tokens": 0,
+    "llm_calls": 6,
+    "escalated": false,
+    "escalation_reason": "",
+    "blocked_actions": 0,
+    "format_errors": 0,
+    "writes": 0,
+    "wall_s": 11.264320333000796,
+    "llm_s": 2.6968275819990595,
+    "error": "",
+    "total_tokens": 7700
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 563,
+      "latency_s": 0.32,
+      "response": "```\nexec_shell(\"kubectl get pods -n hotel-reservation -o wide\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pods -n hotel-reservation -o wide",
+      "guardrail": "read",
+      "observation": "NAME                                     READY   STATUS    RESTARTS   AGE   IP             NODE           NOMINATED NODE   READINESS GATES\nfrontend-4dc6abb6e-fd83b                 1/1     Running   0          42m   10.244.1.147   kind-worker2   <none>           <none>\nsearch-c179abadc-6cfc4                   1/1     Running   0          42m   10.244.2.165   kind-worker2   <none>           <none>\ngeo-f4b9f2896-d3b50                      1/1     Running   0          42m   10.244.1.138   kind-worker    <none>           <none>\nrate-cd21c2450-1321d                     1/1     Running   0          42m   10.244.1.224   kind-worker    <none>           <none>\nrecommendation-c829feafe-40309           1/1     Running   0          42m   10.244.1.106   kind-worker2   <none>           <none>\nreservation-657541b01-4bee0              1/1     Running   0          42m   10.244.1.118   kind-worker    <none>           <none>\nuser-47b43b1dc-6848d                     1/1     Running   0          42m   10.244.2.49    kind-worker2   <none>           <none>\nmongodb-geo-bfc840abb-c98db              1/1     Running   0          42m   10.244.1.64    kind-worker2   <none>           <none>\nmongodb-rate-230f5c1f9-1ec6c             1/1     Running   0          42m   10.244.2.132   kind-worker    <none>           <none>\nmongodb-profile-e174becf9-60a15          1/1     Running   0          42m   10.244.1.82    kind-worker2   <none>           <none>\nmongodb-recommendation-a35e4dea7-d2d46   1/1     Running   0          42m   10.244.1.27    kind-worker    <none>           <none>\nmongodb-reservation-a7f1d70d8-af973      1/1     Running   0          42m   10.244.1.151   kind-worker    <none>           <none>\nmongodb-user-eff0da4a6-42cdc             1/1     Running   0          42m   10.244.2.59    kind-worker    <none>           <none>"
+    },
+    {
+      "step": 2,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1051,
+      "latency_s": 0.47,
+      "response": "```\nexec_shell(\"kubectl logs -n hotel-reservation frontend-4dc6abb6e-fd83b | head\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl logs -n hotel-reservation frontend-4dc6abb6e-fd83b | head",
+      "guardrail": "read",
+      "observation": "level=info msg=\"starting frontend service\" port=5000\nlevel=info msg=\"loaded config\" source=env\nlevel=info msg=\"gRPC server listening\" addr=:5000\nlevel=error msg=\"rpc error: code = Unavailable desc = connection error: desc = \\\"transport: Error while dialing: dial tcp 10.96.87.182:8081: connect: connection refused\\\"\" target=profile:8081 attempt=1\nlevel=warning msg=\"request failed\" path=/hotels status=500 latency=31ms\nlevel=error msg=\"rpc error: code = Unavailable desc = connection error: desc = \\\"transport: Error while dialing: dial tcp 10.96.87.182:8081: connect: connection refused\\\"\" target=profile:8081 attempt=2\nlevel=warning msg=\"request failed\" path=/hotels status=500 latency=31ms\nlevel=info msg=\"request served\" latency=14ms\nlevel=error msg=\"rpc error: code = Unavailable desc = connection error: desc = \\\"transport: Error while dialing: dial tcp 10.96.87.182:8081: connect: connection refused\\\"\" target=profile:8081 attempt=3\nlevel=warning msg=\"request failed\" path=/hotels status=500 latency=31ms"
+    },
+    {
+      "step": 3,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1332,
+      "latency_s": 0.34,
+      "response": "```\nexec_shell(\"kubectl get pod -n hotel-reservation user-47b43b1dc-6848d -o jsonpath='{.status.phase}'\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pod -n hotel-reservation user-47b43b1dc-6848d -o jsonpath='{.status.phase}'",
+      "guardrail": "read",
+      "observation": "error: output format 'jsonpath' is not supported by this cluster's API proxy; use -o yaml, -o json, -o wide or -o name"
+    },
+    {
+      "step": 4,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1380,
+      "latency_s": 0.57,
+      "response": "```\nexec_shell(\"kubectl get pod -n hotel-reservation profile-??????\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get pod -n hotel-reservation profile-??????",
+      "guardrail": "read",
+      "observation": "Error from server (NotFound): pods \"profile-??????\" not found"
+    },
+    {
+      "step": 5,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1411,
+      "latency_s": 0.46,
+      "response": "```\nexec_shell(\"kubectl get deployments -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get deployments -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "NAME                     READY   UP-TO-DATE   AVAILABLE   AGE\nfrontend                 1/1     1            1           42m\nsearch                   1/1     1            1           42m\ngeo                      1/1     1            1           42m\nrate                     1/1     1            1           42m\nprofile                  0/0     0            0           42m\nrecommendation           1/1     1            1           42m\nreservation              1/1     1            1           42m\nuser                     1/1     1            1           42m\nmongodb-geo              1/1     1            1           42m\nmongodb-rate             1/1     1            1           42m\nmongodb-profile          1/1     1            1           42m\nmongodb-recommendation   1/1     1            1           42m\nmongodb-reservation      1/1     1            1           42m\nmongodb-user             1/1     1            1           42m"
+    },
+    {
+      "step": 6,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1963,
+      "latency_s": 0.54,
+      "response": "```\nsubmit([\"profile\"])\n```",
+      "action": "submit",
+      "answer": [
+        "profile"
+      ],
+      "observation": "[evaluation] SUCCESS: top-1 'profile', expected 'profile' (submitted ['profile'])"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "summary": {
+    "episode": "bad_image-mitigation",
+    "scenario": "bad_image",
+    "task": "mitigation",
+    "config": "small",
+    "success": true,
+    "answer": null,
+    "detail": "cluster healthy",
+    "steps": 7,
+    "small_tokens": 8360,
+    "large_tokens": 0,
+    "llm_calls": 7,
+    "escalated": false,
+    "escalation_reason": "",
+    "blocked_actions": 0,
+    "format_errors": 0,
+    "writes": 1,
+    "wall_s": 66.50918575000014,
+    "llm_s": 5.001312083998528,
+    "error": "",
+    "total_tokens": 8360
+  },
+  "trace": [
+    {
+      "step": 1,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 601,
+      "latency_s": 0.22,
+      "response": "```\nexec_shell(\"kubectl get deployments -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get deployments -n hotel-reservation",
+      "guardrail": "read",
+      "observation": "NAME                     READY   UP-TO-DATE   AVAILABLE   AGE\nfrontend                 1/1     1            1           42m\nsearch                   1/1     1            1           42m\ngeo                      1/1     1            1           42m\nrate                     0/1     1            0           42m\nprofile                  1/1     1            1           42m\nrecommendation           1/1     1            1           42m\nreservation              1/1     1            1           42m\nuser                     1/1     1            1           42m\nmongodb-geo              1/1     1            1           42m\nmongodb-rate             1/1     1            1           42m\nmongodb-profile          1/1     1            1           42m\nmongodb-recommendation   1/1     1            1           42m\nmongodb-reservation      1/1     1            1           42m\nmongodb-user             1/1     1            1           42m"
+    },
+    {
+      "step": 2,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 864,
+      "latency_s": 0.54,
+      "response": "```\nexec_shell(\"kubectl logs -n hotel-reservation deployment/rate --tail=20\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl logs -n hotel-reservation deployment/rate --tail=20",
+      "guardrail": "read",
+      "observation": "Error from server (BadRequest): container \"rate\" in pod \"rate-096cf7c26-bd3ff\" is waiting to start: trying and failing to pull image"
+    },
+    {
+      "step": 3,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 920,
+      "latency_s": 0.52,
+      "response": "```\nexec_shell(\"kubectl get deployment rate -n hotel-reservation -o yaml | grep image -n\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl get deployment rate -n hotel-reservation -o yaml | grep image -n",
+      "guardrail": "read",
+      "observation": "        image: opspilot/hotel-rate:1.5.0-rc3"
+    },
+    {
+      "step": 4,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 951,
+      "latency_s": 0.8,
+      "response": "```\nexec_shell(\"kubectl rollout undo deployment/rate -n hotel-reservation\")\n```",
+      "action": "exec_shell",
+      "command": "kubectl rollout undo deployment/rate -n hotel-reservation",
+      "guardrail": "write",
+      "observation": "deployment.apps/rate rolled back"
+    },
+    {
+      "step": 5,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1387,
+      "latency_s": 1.24,
+      "response": "```\nexec_shell(\"kubectl get pods -n hotel-reservation -l app=rate\")\n``````\nexec_shell(\"kubectl get pod rate-096cf7c26-bd3ff -n hotel-reservation -o jsonpath='{.status.phase}'\")\n```<|start|>assistant<|channel|>analysis<|message|>If still Pending, maybe image tag wrong. Let's inspect events.```\nexec_shell(\"kubectl describe pod rate-096cf7c26-bd3ff -n hotel-reservation | grep -i event -A2\")\n```<|start|>assistant<|channel|>analysis<|message|>If image not found, maybe registry. Let's try pulling manually? Can't. Maybe image tag wrong; use previous tag. Check previous rollout history.```\nexec_shell(\"kubectl rollout history deployment/rate -n hotel-reservation\")\n```<|start|>assistant<|channel|>analysis<|message|>Assume previous image was opspilot/hotel-rate:1.4.0. Let's patch deployment to that.```\nexec_shell(\"kubectl patch deployment rate -n hotel-reservation -p '{\\\"spec\\\":{\\\"template\\\":{\\\"spec\\\":{\\\"containers\\\":[{\\\"name\\\":\\\"rate\\\",\\\"image\\\":\\\"opspilot/hotel-rate:1.4.0\\\"}]}}}}'\")\n```<|start|>assistant<|channel|>analysis<|message|>Check pod status.```\nexec_shell(\"kubectl get pods -n hotel-reservation -l app=rate\")\n```<|start|>assistant<|channel|>analysis<|message|>If ready, submit.```\nsubmit()\n```",
+      "action": "exec_shell",
+      "warning": "7 code blocks; only the first was executed",
+      "command": "kubectl get pods -n hotel-reservation -l app=rate",
+      "guardrail": "read",
+      "observation": "NAME                   READY   STATUS    RESTARTS   AGE\nrate-cd21c2450-47fdd   1/1     Running   0          15s"
+    },
+    {
+      "step": 6,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 1452,
+      "latency_s": 0.71,
+      "response": "```\nsubmit()\n```",
+      "action": "submit",
+      "answer": null,
+      "observation": "Pre-submit verification (OpsPilot runs this automatically before closing a mitigation):\n$ kubectl get pods -n hotel-reservation\nNAME                                     READY   STATUS    RESTARTS   AGE\nfrontend-4dc6abb6e-fd83b                 1/1     Running   0          42m\nsearch-c179abadc-6cfc4                   1/1     Running   0          42m\ngeo-f4b9f2896-d3b50                      1/1     Running   0          42m\nrate-cd21c2450-47fdd                     1/1     Running   0          15s\nprofile-d2ab717b5-8748a                  1/1     Running   0          42m\nrecommendation-c829feafe-40309           1/1     Running   0          42m\nreservation-657541b01-4bee0              1/1     Running   0          42m\nuser-47b43b1dc-6848d                     1/1     Running   0          42m\nmongodb-geo-bfc840abb-c98db              1/1     Running   0          42m\nmongodb-rate-230f5c1f9-1ec6c             1/1     Running   0          42m\nmongodb-profile-e174becf9-60a15          1/1     Running   0          42m\nmongodb-recommendation-a35e4dea7-d2d46   1/1     Running   0          42m\nmongodb-reservation-a7f1d70d8-af973      1/1     Running   0          42m\nmongodb-user-eff0da4a6-42cdc             1/1     Running   0          42m\n$ kubectl get endpoints -n hotel-reservation\nNAME                     ENDPOINTS            AGE\nfrontend                 10.244.1.147:5000    42m\nsearch                   10.244.2.165:8082    42m\ngeo                      10.244.1.138:8083    42m\nrate                     10.244.1.177:8084    42m\nprofile                  10.244.1.165:8081    42m\nrecommendation           10.244.1.106:8085    42m\nreservation              10.244.1.118:8087    42m\nuser                     10.244.2.49:8086     42m\nmongodb-geo              10.244.1.64:27017    42m\nmongodb-rate             10.244.2.132:27017   42m\nmongodb-profile          10.244.1.82:27017    42m\nmongodb-recommendation   10.244.1.27:27017    42m\nmongodb-reservation      10.244.1.151:27017   42m\nmongodb-user             10.244.2.59:27017    42m\nIf every pod is 1/1 Running and every service has endpoints on the right port, call submit() again. Otherwise keep fixing."
+    },
+    {
+      "step": 7,
+      "tier": "small",
+      "model": "openai/gpt-oss-20b",
+      "tokens": 2185,
+      "latency_s": 0.98,
+      "response": "```\nsubmit()\n```",
+      "action": "submit",
+      "answer": null,
+      "observation": "[evaluation] SUCCESS: cluster healthy"
+    }
+  ]
+}

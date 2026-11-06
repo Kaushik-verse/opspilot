@@ -1,0 +1,41 @@
+PASS  small             scale_zero-detection         steps= 7 tokens= 11433  
+PASS  small             scale_zero-localization      steps= 8 tokens= 12888  
+ERR   small             scale_zero-mitigation        steps= 2 tokens=  1452  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 429: {"error":{"message":"Rate limit reached for model `ope
+PASS  small             target_port-detection        steps=12 tokens= 23727  
+PASS  small             target_port-localization     steps=10 tokens= 17434  
+FAIL  small             target_port-mitigation       steps=15 tokens= 28052  
+PASS  small             bad_image-detection          steps= 6 tokens=  9407  
+ERR   small             bad_image-localization       steps= 1 tokens=   563  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 400: {"error":{"message":"Parsing failed. The model generat
+PASS  small             bad_image-mitigation         steps= 7 tokens=  8360  
+PASS  small             node_selector-detection      steps= 6 tokens=  8110  
+PASS  small             node_selector-localization   steps= 6 tokens=  8327  
+PASS  small             node_selector-mitigation     steps= 7 tokens=  8743  
+PASS  small             missing_env-detection        steps= 6 tokens=  9093  
+PASS  small             missing_env-localization     steps= 8 tokens= 10690  
+ERR   small             missing_env-mitigation       steps= 6 tokens=  9299  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 429: {"error":{"message":"Rate limit reached for model `ope
+ERR   small             healthy-detection            steps= 2 tokens=  1690  LLMError: groq/openai/gpt-oss-20b failed after retries: HTTP 429: {"error":{"message":"Rate limit reached for model `ope
+PASS  large             scale_zero-detection         steps= 8 tokens= 15374  
+PASS  large             scale_zero-localization      steps= 8 tokens= 14365  
+PASS  large             scale_zero-mitigation        steps=10 tokens= 22713  
+PASS  large             target_port-detection        steps= 7 tokens= 13339  
+PASS  large             target_port-localization     steps= 8 tokens= 15244  
+PASS  large             target_port-mitigation       steps=15 tokens= 37435  
+PASS  large             bad_image-detection          steps= 8 tokens= 15104  
+PASS  large             bad_image-localization       steps= 6 tokens=  9814  
+PASS  large             bad_image-mitigation         steps= 5 tokens= 10205  
+PASS  large             node_selector-detection      steps= 7 tokens=  9534  
+PASS  large             node_selector-localization   steps= 5 tokens=  6925  
+PASS  large             node_selector-mitigation     steps=12 tokens= 28326  
+PASS  large             missing_env-detection        steps= 4 tokens=  4897  
+PASS  large             missing_env-localization     steps= 6 tokens= 10251  
+PASS  large             missing_env-mitigation       steps= 7 tokens= 11908  
+PASS  large             healthy-detection            steps= 6 tokens=  8260  
+
+| Config | Overall | Detection | Localization | Mitigation | Avg steps | Tokens / episode | Large-model token share | Guardrail blocks |
+|---|---|---|---|---|---|---|---|---|
+| `small` | **69%** | 83% | 80% | 40% | 6.8 | 10,579 | 0% | 6 |
+| `large` | **100%** | 100% | 100% | 100% | 7.6 | 14,606 | 100% | 0 |
+
+run: `main-k2` · backend: `sim` · small model: `openai/gpt-oss-20b` · large model: `openai/gpt-oss-120b` · max steps: `15` · python: `3.11.8`
+
+Report: results/main-k2/report.html
